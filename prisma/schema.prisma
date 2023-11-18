@@ -1,0 +1,48 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Ticker {
+  id             String          @id @default(auto()) @map("_id") @db.ObjectId
+  symbol         String          @unique
+  tickerData     TickerData?
+  tickerHandlers TickerHandler[]
+  updatedAt      DateTime?       @updatedAt
+
+  @@map("tickers")
+}
+
+model TickerData {
+  id            String  @id @default(auto()) @map("_id") @db.ObjectId
+  price         String
+  dividend      String?
+  dividendYield String?
+  nextPayDate   String?
+  nextExDate    String?
+  financials    Json?
+  dividends     Json?
+  historical    Json?
+  ticker        Ticker  @relation(fields: [tickerId], references: [id])
+  tickerId      String  @unique @db.ObjectId
+
+  @@map("tickersData")
+}
+
+model TickerHandler {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  ticker    Ticker   @relation(fields: [tickerId], references: [id])
+  tickerId  String   @unique @db.ObjectId
+  url       String
+  enabled   Boolean
+  updatedAt DateTime @updatedAt
+
+  @@map("tickersHandlers")
+}

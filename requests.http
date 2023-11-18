@@ -1,0 +1,6 @@
+PUT http://localhost:4000/ticker HTTP/1.1
+content-type: application/json
+
+{
+    "symbol": "ARR"
+}

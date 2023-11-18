@@ -1,0 +1,51 @@
+name: CI
+on: [push, pull_request, workflow_dispatch]
+permissions: write-all
+jobs:
+  # test:
+  #   ...
+  versioning:
+    name: Versioning
+    runs-on: self-hosted
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+    - name: Install dependencies
+      run: npx ci
+    - name: Install yarn
+      run: npm install -g yarn
+    - name: Install semantic-release extra plugins
+      run: npm install --save-dev @semantic-release/changelog @semantic-release/git      
+    - name: Versioning
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: npx semantic-release
+  deploy:
+    name: "Deploy to staging"
+    runs-on: self-hosted
+    needs: versioning
+    # if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+    # needs: test
+    steps:
+    - name: multiple command
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.HOST }}
+        username: ${{ secrets.USERNAME }}
+        key: ${{ secrets.KEY }}
+        script: |
+          pm2 stop stocks-info
+          rm -rf /tmp/stocks-info 
+          cd /tmp && git clone https://github.com/vichaunter/stocks-info.git
+          rsync -r /tmp/stocks-info/dist/ /opt/services/stocks-info/dist
+          rsync /tmp/stocks-info/package.json /opt/services/stocks-info/package.json
+          echo "DATABASE_URL=${{ secrets.DATABASE_URL }}" > /opt/services/stocks-info/.env
+          echo "DB_HANDLER=${{ secrets.DB_HANDLER }}" >> /opt/services/stocks-info/.env
+          cd /opt/services/stocks-info/
+          yarn install --ignore-engines
+          pm2 start stocks-info
