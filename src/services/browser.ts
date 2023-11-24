@@ -68,14 +68,14 @@ class Browser {
   private instance: PPBrowser;
 
   constructor() {
-    this.init();
+    process.env.MODE === "services" && this.init();
   }
 
   private async init() {
     if (!this.instance) {
       const locale = await getSystemLocale();
       this.instance = await puppeteer.launch({
-        headless: false, //"new",
+        headless: "new",
         args: ["--no-sandbox", `--lang=${locale}`],
       });
     }
@@ -97,14 +97,12 @@ class Browser {
   }
 
   closeInstance() {
-    this.instance.close()
+    this.instance.close();
   }
 
-  async getPageSourceHtml(
-    url: string,
-  ): Promise<string | undefined> {
+  async getPageSourceHtml(url: string): Promise<string | undefined> {
     const page = await this.getPage();
-    let pageSource = ''
+    let pageSource = "";
 
     try {
       await page.goto(url, { waitUntil: "networkidle0" });
@@ -118,7 +116,6 @@ class Browser {
 
     return pageSource;
   }
-
 }
 
 export const browser = new Browser();

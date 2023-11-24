@@ -66,13 +66,13 @@ const USER_AGENTS = [
 ];
 class Browser {
     constructor() {
-        this.init();
+        process.env.MODE === "services" && this.init();
     }
     async init() {
         if (!this.instance) {
             const locale = await (0, system_locale_1.default)();
             this.instance = await puppeteer_1.default.launch({
-                headless: false, //"new",
+                headless: "new",
                 args: ["--no-sandbox", `--lang=${locale}`],
             });
         }
@@ -94,7 +94,7 @@ class Browser {
     }
     async getPageSourceHtml(url) {
         const page = await this.getPage();
-        let pageSource = '';
+        let pageSource = "";
         try {
             await page.goto(url, { waitUntil: "networkidle0" });
             pageSource = await page.content();

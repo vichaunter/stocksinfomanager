@@ -21,17 +21,23 @@ model Ticker {
 }
 
 model TickerData {
-  id            String  @id @default(auto()) @map("_id") @db.ObjectId
-  price         String
-  dividend      String?
-  dividendYield String?
-  nextPayDate   String?
-  nextExDate    String?
-  financials    Json?
-  dividends     Json?
-  historical    Json?
-  ticker        Ticker  @relation(fields: [tickerId], references: [id])
-  tickerId      String  @unique @db.ObjectId
+  id                       String  @id @default(auto()) @map("_id") @db.ObjectId
+  price                    String
+  dividend                 String?
+  dividendYield            String?
+  dividend5YearGrowhthRate String?
+  dividendYearsGrowhth     String?
+  dividendPayoutRatio      String?
+  dividendFrequency        String?
+  lastExDate               String?
+  lastPayoutDate           String?
+  nextPayDate              String?
+  nextExDate               String?
+  financials               Json?
+  dividends                Json?
+  historical               Json?
+  ticker                   Ticker  @relation(fields: [tickerId], references: [id])
+  tickerId                 String  @unique @db.ObjectId
 
   @@map("tickersData")
 }

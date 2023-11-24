@@ -19,6 +19,7 @@ if (process.env.MODE === "services") {
   const app = express();
   app.use(express.json());
   mapRoutes(app);
+
   const server = app.listen(4000, async () => {
     const { port } = server.address() as { port: number };
     console.log(`Server started on port: http://localhost:${port}`);

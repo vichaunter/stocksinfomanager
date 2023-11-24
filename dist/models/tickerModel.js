@@ -32,9 +32,15 @@ const scraperHandlers = __importStar(require("../services/scraper/handlers"));
 class TickerModel {
     constructor(ticker) {
         this.tickerData = {
+            id: null,
             dividend: null,
             dividendYield: null,
-            id: null,
+            dividend5YearGrowhthRate: null,
+            dividendFrequency: null,
+            dividendPayoutRatio: null,
+            dividendYearsGrowhth: null,
+            lastExDate: null,
+            lastPayoutDate: null,
             nextExDate: null,
             nextPayDate: null,
             price: null,

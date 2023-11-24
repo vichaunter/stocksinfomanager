@@ -1,8 +1,8 @@
 //@ts-nocheck
 import ScraperError from "../../../errors/scraperError";
-import nasdaqfinancials from "./nasdaqfinancials";
+import nasdaqfinancials from "./nasdaq";
 
-describe("nasdaqfinancials", () => {
+describe("nasdaq", () => {
   it("should load default handler", async () => {
     const symbol = "VZ";
     const str = await nasdaqfinancials.defaultHandler(symbol);
