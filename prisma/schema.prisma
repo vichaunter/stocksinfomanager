@@ -15,6 +15,7 @@ model Ticker {
   symbol         String          @unique
   tickerData     TickerData?
   tickerHandlers TickerHandler[]
+  error          Json?
   updatedAt      DateTime?       @updatedAt
 
   @@map("tickers")
