@@ -56,4 +56,16 @@ const addTicker: RouteHanlder = async (req, res) => {
   return res.status(200).send(ticker);
 };
 
-export default { getTicker, getTickers, addTicker };
+const updateTicker: RouteHanlder = async (req, res) => {
+  let { ticker } = req.params as { ticker: string };
+  if (ticker) {
+    const dbTicker = await database.getTicker(ticker);
+
+    await updater.updateTicker(dbTicker);
+
+    const updated = await database.getTicker(ticker);
+    return res.status(200).send(updated);
+  }
+};
+
+export default { getTicker, getTickers, addTicker, updateTicker };

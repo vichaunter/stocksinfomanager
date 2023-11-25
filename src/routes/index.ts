@@ -21,6 +21,7 @@ const router = Router();
 
 router.use("/tickers", tickerController.getTickers);
 router.use("/ticker/:ticker/:key?", tickerController.getTicker);
+router.use("/ticker/update/:ticker", tickerController.updateTicker);
 
 router.put("/ticker", tickerController.addTicker);
 
