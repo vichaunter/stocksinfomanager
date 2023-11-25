@@ -17,11 +17,7 @@ type GetTickerDataProps = {
   url: string;
   parser: ScraperHandler;
 };
-const getTickerData = async ({
-  item,
-  url,
-  parser,
-}: GetTickerDataProps) => {
+const getTickerData = async ({ item, url, parser }: GetTickerDataProps) => {
   let parsed;
   if (parser.mode === "standalone") {
     const source = await browser.getPageSourceHtml(url);
@@ -68,6 +64,7 @@ const updateTicker = async (item: QueueItem) => {
 
             throw Error("Data not found");
           } catch (error) {
+              await database.saveTickerError(item, {name: error.name, message: error.message})
             return reject(error);
           }
         });
@@ -135,7 +132,9 @@ const tickerUpdaterService = async () => {
     tickerUpdaterService();
   } else {
     console.log(
-      pc.yellow(`${pc.red("!!")}This is an incomplete ticker... deleted`)
+      pc.yellow(
+        `${pc.red("!!")}This is an incomplete ticker... removed from queue`
+      )
     );
 
     setTimeout(() => {
@@ -153,9 +152,12 @@ const loadStoredTickers = async () => {
   //pick older updated first
   tickers.sort((a, b) => (a.updatedAt as any) - (b.updatedAt as any));
 
-  console.log("TICKERS", tickers.length);
+  const tickersWithoutErrors = tickers.filter((t) => !t.tickerData && !t.error);
+  const validTickers = tickers.filter((t) => t.tickerData && !t.error);
+  
+  console.log("TICKERS", tickersWithoutErrors.length, validTickers.length);
 
-  tickers.forEach((ticker) => {
+  [...tickersWithoutErrors, ...validTickers].forEach((ticker) => {
     queue.push(ticker);
   });
 

@@ -27,7 +27,7 @@ const parse = (source: string): Record<string, string> => {
   }
   const $ = cheerioLoad(source);
   const data = $(`div[data-test-id="scorecard-section-content"]`);
-
+  
   const extracted = {}
   data.each((i, block) => {
     $(block).find("div").each((y, row) => {
@@ -43,32 +43,6 @@ const parse = (source: string): Record<string, string> => {
 
 
   return extracted
-
-  // const rows = [];
-  // const mapped = {};
-  // const data = $(".screener_snapshot-table-wrapper table  tr");
-  // if (!data.length) throw new ScraperError(`Invalid handler: Data not found`);
-
-  // data.each((i, row) => {
-  //   const rowData = [];
-  //   $(row)
-  //     .find("td")
-  //     .each((j, cell) => {
-  //       rowData.push($(cell).text().trim());
-  //     });
-
-  //   for (let i = 0; i < rowData.length; i += 2) {
-  //     const key = rowData[i] === "Dividend %" ? "DividendYield" : rowData[i];
-  //     const camelKey = camelizeText(key);
-
-  //     if (!validKeys.includes(camelKey)) continue;
-  //     mapped[camelKey] = rowData[i + 1];
-  //   }
-  //   rows.push(rowData);
-  // });
-
-  // console.log(mapped);
-  // return mapped;
 };
 
 const fetchData = async ({ item }) => {

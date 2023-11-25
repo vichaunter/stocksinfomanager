@@ -1,6 +1,7 @@
 import { load as cheerioLoad } from "cheerio";
 import pc from "picocolors";
 import ScraperError from "../../../errors/scraperError";
+import ScraperHandlerError from "../../../errors/scraperHandlerError";
 import { ScraperHandler } from "../../../types";
 import { camelizeText } from "../../../utils";
 import { browser } from "../../browser";
@@ -95,7 +96,9 @@ const parse = (source: string): Record<string, string> => {
   const rows = [];
   const mapped = {};
   const data = $(".screener_snapshot-table-wrapper table  tr");
-  if (!data.length) throw new ScraperError(`Invalid handler: Data not found`);
+  if (!data.length) throw new ScraperHandlerError(name, "DATA_NOT_FOUND")
+  
+  //ScraperError(`Invalid handler ${name}: Data not found`);
 
   data.each((i, row) => {
     const rowData = [];

@@ -47,4 +47,13 @@ const addTicker = async (req, res) => {
     const ticker = await tickerModel_1.default.addTicker({ symbol });
     return res.status(200).send(ticker);
 };
-exports.default = { getTicker, getTickers, addTicker };
+const updateTicker = async (req, res) => {
+    let { ticker } = req.params;
+    if (ticker) {
+        const dbTicker = await database_1.default.getTicker(ticker);
+        await updater_1.default.updateTicker(dbTicker);
+        const updated = await database_1.default.getTicker(ticker);
+        return res.status(200).send(updated);
+    }
+};
+exports.default = { getTicker, getTickers, addTicker, updateTicker };

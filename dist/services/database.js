@@ -31,6 +31,9 @@ class Database {
     async saveTicker(ticker) {
         return this.handler.saveTicker(ticker);
     }
+    async saveTickerError(ticker, error) {
+        return this.handler.saveTickerError(ticker, error);
+    }
     async addTicker(symbol) {
         return this.handler.addTicker(symbol);
     }

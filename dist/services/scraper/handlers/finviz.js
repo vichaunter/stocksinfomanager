@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const cheerio_1 = require("cheerio");
 const picocolors_1 = __importDefault(require("picocolors"));
 const scraperError_1 = __importDefault(require("../../../errors/scraperError"));
+const scraperHandlerError_1 = __importDefault(require("../../../errors/scraperHandlerError"));
 const utils_1 = require("../../../utils");
 const browser_1 = require("../../browser");
 const name = "finviz";
@@ -95,7 +96,8 @@ const parse = (source) => {
     const mapped = {};
     const data = $(".screener_snapshot-table-wrapper table  tr");
     if (!data.length)
-        throw new scraperError_1.default(`Invalid handler: Data not found`);
+        throw new scraperHandlerError_1.default(name, "DATA_NOT_FOUND");
+    //ScraperError(`Invalid handler ${name}: Data not found`);
     data.each((i, row) => {
         const rowData = [];
         $(row)

@@ -17,6 +17,7 @@ export type TickerFlatData = {
 class TickerModel {
   id: string; // dbId
   symbol: string;
+  error: any
   updatedAt: Date;
   tickerHandlers: TickerHandler[];
   tickerData: TickerData | null = {
@@ -122,6 +123,11 @@ class TickerModel {
     this.tickerData = { ...this.tickerData, ...data };
 
     return this;
+  }
+
+  async saveError(error: any){
+    this.error = error
+    await database.saveTicker(this)
   }
 
   async saveTicker() {

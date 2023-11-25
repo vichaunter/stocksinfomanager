@@ -119,6 +119,10 @@ class TickerModel {
         this.tickerData = { ...this.tickerData, ...data };
         return this;
     }
+    async saveError(error) {
+        this.error = error;
+        await database_1.default.saveTicker(this);
+    }
     async saveTicker() {
         try {
             if (this.symbol && this.id && this.tickerData) {

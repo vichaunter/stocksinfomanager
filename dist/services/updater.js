@@ -32,7 +32,7 @@ const database_1 = __importDefault(require("./database"));
 const scraperHandlers = __importStar(require("./scraper/handlers"));
 const browser_1 = require("./browser");
 const queue = [];
-const getTickerData = async ({ item, url, parser, }) => {
+const getTickerData = async ({ item, url, parser }) => {
     let parsed;
     if (parser.mode === "standalone") {
         const source = await browser_1.browser.getPageSourceHtml(url);
@@ -69,6 +69,7 @@ const updateTicker = async (item) => {
                     throw Error("Data not found");
                 }
                 catch (error) {
+                    await database_1.default.saveTickerError(item, { name: error.name, message: error.message });
                     return reject(error);
                 }
             });
@@ -131,7 +132,7 @@ const tickerUpdaterService = async () => {
         tickerUpdaterService();
     }
     else {
-        console.log(picocolors_1.default.yellow(`${picocolors_1.default.red("!!")}This is an incomplete ticker... deleted`));
+        console.log(picocolors_1.default.yellow(`${picocolors_1.default.red("!!")}This is an incomplete ticker... removed from queue`));
         setTimeout(() => {
             tickerUpdaterService();
         }, 60 * 1000);
@@ -144,8 +145,10 @@ const loadStoredTickers = async () => {
     const tickers = await tickerModel_1.default.getTickers();
     //pick older updated first
     tickers.sort((a, b) => a.updatedAt - b.updatedAt);
-    console.log("TICKERS", tickers.length);
-    tickers.forEach((ticker) => {
+    const tickersWithoutErrors = tickers.filter((t) => !t.tickerData && !t.error);
+    const validTickers = tickers.filter((t) => t.tickerData && !t.error);
+    console.log("TICKERS", tickersWithoutErrors.length, validTickers.length);
+    [...tickersWithoutErrors, ...validTickers].forEach((ticker) => {
         queue.push(ticker);
     });
     // console.log(queue);

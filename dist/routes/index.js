@@ -26,6 +26,7 @@ exports.notExistingRoute = notExistingRoute;
 const router = (0, express_1.Router)();
 router.use("/tickers", tickerController_1.default.getTickers);
 router.use("/ticker/:ticker/:key?", tickerController_1.default.getTicker);
+router.use("/ticker/update/:ticker", tickerController_1.default.updateTicker);
 router.put("/ticker", tickerController_1.default.addTicker);
 const mapRoutes = (app) => {
     app.use("/", router);

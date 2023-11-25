@@ -90,6 +90,26 @@ class MongoDBDatabaseHandler extends DatabaseHandler_1.default {
         }
         return false;
     }
+    async saveTickerError(ticker, error) {
+        try {
+            if (!ticker.id)
+                throw Error(`[saveTickerError] Invalid ticker not in database: ${ticker.symbol}, Skipping...`);
+            const update = this.prisma.ticker.update({
+                where: { id: ticker.id },
+                data: {
+                    updatedAt: new Date(),
+                    error
+                },
+            });
+            await this.saveHandlers(ticker);
+            this.prisma.$transaction([update]);
+            return true;
+        }
+        catch (e) {
+            console.log(picocolors_1.default.red(e));
+            return false;
+        }
+    }
     async saveTicker(ticker) {
         try {
             if (!ticker.tickerData.price)

@@ -16,13 +16,13 @@ class Database {
     this.handler.init();
   }
 
-  async getTicker(ticker: TickerModel["symbol"]): Promise<Ticker | null> {
+  async getTicker(ticker: TickerModel["symbol"]): Promise<TickerModel | null> {
     return this.handler.getTicker(ticker);
   }
 
   async getTickers(): Promise<TickerModel[] | null> {
     return this.handler.getTickers();
-  }
+  }  
 
   async getTickersFlatData() {
     return this.handler.getTickersFlatData();
@@ -38,6 +38,10 @@ class Database {
 
   async saveTicker(ticker: TickerModel): Promise<boolean> {
     return this.handler.saveTicker(ticker);
+  }
+
+  async saveTickerError(ticker: TickerModel, error: any): Promise<boolean>{
+    return this.handler.saveTickerError(ticker, error)
   }
 
   async addTicker(symbol: string): Promise<Ticker> {
