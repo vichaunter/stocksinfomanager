@@ -1,7 +1,7 @@
 import { PrismaClient, TickerHandler } from "@prisma/client";
 import pc from "picocolors";
 import TickerModel, { TickerFlatData } from "../../models/tickerModel";
-import DatabaseHandler from "./DatabaseHandler";
+import DatabaseHandler, { DbGetTickersParams } from "./DatabaseHandler";
 
 class MongoDBDatabaseHandler extends DatabaseHandler {
   prisma: PrismaClient;
@@ -28,7 +28,7 @@ class MongoDBDatabaseHandler extends DatabaseHandler {
       },
     });
 
-    return new TickerModel(result);
+    return result ? new TickerModel(result) : null;
   }
 
   async getTickerHandlers(tickerId: string): Promise<TickerHandler[] | null> {
@@ -41,10 +41,31 @@ class MongoDBDatabaseHandler extends DatabaseHandler {
     return result;
   }
 
-  async getTickers(): Promise<TickerModel[] | null> {
+  async getTickers({
+    historical = false,
+    financials = false,
+    dividends = false,
+  }: Partial<DbGetTickersParams> = {}): Promise<TickerModel[] | null> {
     const result = await this.prisma.ticker.findMany({
       include: {
-        tickerData: true,
+        tickerData: {
+          select: {
+            price: true,
+            dividend: true,
+            dividendYield: true,
+            dividend5YearGrowhthRate: true,
+            dividendYearsGrowhth: true,
+            dividendPayoutRatio: true,
+            dividendFrequency: true,
+            lastExDate: true,
+            lastPayoutDate: true,
+            nextPayDate: true,
+            nextExDate: true,
+            financials,
+            dividends,
+            historical
+          }
+        },
         tickerHandlers: true,
       },
     });
@@ -63,6 +84,7 @@ class MongoDBDatabaseHandler extends DatabaseHandler {
       return {
         id: item.id,
         symbol: item.symbol,
+        error: item.error,
         data,
       };
     });
@@ -103,8 +125,8 @@ class MongoDBDatabaseHandler extends DatabaseHandler {
     return false;
   }
 
-  async saveTickerError(ticker: TickerModel, error: any){
-    try{
+  async saveTickerError(ticker: TickerModel, error: any) {
+    try {
       if (!ticker.id)
         throw Error(`[saveTickerError] Invalid ticker not in database: ${ticker.symbol}, Skipping...`);
 
@@ -119,7 +141,7 @@ class MongoDBDatabaseHandler extends DatabaseHandler {
       await this.saveHandlers(ticker);
       this.prisma.$transaction([update]);
       return true
-    }catch(e){
+    } catch (e) {
       console.log(pc.red(e));
       return false;
     }

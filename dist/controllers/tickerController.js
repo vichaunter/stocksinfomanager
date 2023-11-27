@@ -10,8 +10,7 @@ const updater_1 = __importDefault(require("../services/updater"));
 const getTicker = (req, res) => {
     (0, routes_1.errorWrapper)(res, async () => {
         let { ticker, key } = req.params;
-        const dbTicker = await database_1.default.getTicker(ticker);
-        const tickerModel = new tickerModel_1.default(dbTicker);
+        const tickerModel = await database_1.default.getTicker(ticker);
         const data = await tickerModel.getData();
         if (!data) {
             updater_1.default.addTickerToUpdate(tickerModel);

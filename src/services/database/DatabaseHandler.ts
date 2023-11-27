@@ -1,6 +1,12 @@
 import { Ticker, TickerHandler } from "@prisma/client";
 import TickerModel, { TickerFlatData } from "../../models/tickerModel";
 
+export type DbGetTickersParams = {
+  historical?: boolean;
+  financials?: boolean;
+  dividends?: boolean;
+};
+
 abstract class DatabaseHandler {
   abstract init(): void;
 
@@ -10,7 +16,9 @@ abstract class DatabaseHandler {
 
   abstract getTickerHandlers(tickerId: string): Promise<TickerHandler[] | null>;
 
-  abstract getTickers(): Promise<TickerModel[] | null>;
+  abstract getTickers(
+    options?: Partial<DbGetTickersParams>
+  ): Promise<TickerModel[] | null>;
 
   abstract getTickersFlatData(): Promise<TickerFlatData[] | null>;
 
@@ -18,7 +26,7 @@ abstract class DatabaseHandler {
 
   abstract saveTicker(ticker: TickerModel): Promise<boolean>;
 
-  abstract saveTickerError(ticker: TickerModel, error: any): Promise<boolean>
+  abstract saveTickerError(ticker: TickerModel, error: any): Promise<boolean>;
 
   abstract addTicker(symbol: string): Promise<Ticker>;
 }

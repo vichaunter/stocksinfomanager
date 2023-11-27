@@ -26,7 +26,7 @@ class MongoDBDatabaseHandler extends DatabaseHandler_1.default {
                 tickerHandlers: true,
             },
         });
-        return new tickerModel_1.default(result);
+        return result ? new tickerModel_1.default(result) : null;
     }
     async getTickerHandlers(tickerId) {
         const result = await this.prisma.tickerHandler.findMany({
@@ -36,10 +36,27 @@ class MongoDBDatabaseHandler extends DatabaseHandler_1.default {
         });
         return result;
     }
-    async getTickers() {
+    async getTickers({ historical = false, financials = false, dividends = false, } = {}) {
         const result = await this.prisma.ticker.findMany({
             include: {
-                tickerData: true,
+                tickerData: {
+                    select: {
+                        price: true,
+                        dividend: true,
+                        dividendYield: true,
+                        dividend5YearGrowhthRate: true,
+                        dividendYearsGrowhth: true,
+                        dividendPayoutRatio: true,
+                        dividendFrequency: true,
+                        lastExDate: true,
+                        lastPayoutDate: true,
+                        nextPayDate: true,
+                        nextExDate: true,
+                        financials,
+                        dividends,
+                        historical
+                    }
+                },
                 tickerHandlers: true,
             },
         });
@@ -56,6 +73,7 @@ class MongoDBDatabaseHandler extends DatabaseHandler_1.default {
             return {
                 id: item.id,
                 symbol: item.symbol,
+                error: item.error,
                 data,
             };
         });

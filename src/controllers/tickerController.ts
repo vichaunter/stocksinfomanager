@@ -8,9 +8,8 @@ const getTicker: RouteHanlder = (req, res) => {
   errorWrapper(res, async () => {
     let { ticker, key } = req.params as { ticker: string; key: string };
 
-    const dbTicker = await database.getTicker(ticker);
+    const tickerModel = await database.getTicker(ticker);
 
-    const tickerModel = new TickerModel(dbTicker);
     const data = await tickerModel.getData();
 
     if (!data) {
