@@ -48,24 +48,7 @@ class MongoDBDatabaseHandler extends DatabaseHandler {
   }: Partial<DbGetTickersParams> = {}): Promise<TickerModel[] | null> {
     const result = await this.prisma.ticker.findMany({
       include: {
-        tickerData: {
-          select: {
-            price: true,
-            dividend: true,
-            dividendYield: true,
-            dividend5YearGrowhthRate: true,
-            dividendYearsGrowhth: true,
-            dividendPayoutRatio: true,
-            dividendFrequency: true,
-            lastExDate: true,
-            lastPayoutDate: true,
-            nextPayDate: true,
-            nextExDate: true,
-            financials,
-            dividends,
-            historical
-          }
-        },
+        tickerData: true,
         tickerHandlers: true,
       },
     });
@@ -128,19 +111,21 @@ class MongoDBDatabaseHandler extends DatabaseHandler {
   async saveTickerError(ticker: TickerModel, error: any) {
     try {
       if (!ticker.id)
-        throw Error(`[saveTickerError] Invalid ticker not in database: ${ticker.symbol}, Skipping...`);
+        throw Error(
+          `[saveTickerError] Invalid ticker not in database: ${ticker.symbol}, Skipping...`
+        );
 
       const update = this.prisma.ticker.update({
         where: { id: ticker.id },
         data: {
           updatedAt: new Date(),
-          error
+          error,
         },
       });
 
       await this.saveHandlers(ticker);
       this.prisma.$transaction([update]);
-      return true
+      return true;
     } catch (e) {
       console.log(pc.red(e));
       return false;

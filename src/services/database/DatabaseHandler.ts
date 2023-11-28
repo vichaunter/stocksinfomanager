@@ -16,9 +16,7 @@ abstract class DatabaseHandler {
 
   abstract getTickerHandlers(tickerId: string): Promise<TickerHandler[] | null>;
 
-  abstract getTickers(
-    options?: Partial<DbGetTickersParams>
-  ): Promise<TickerModel[] | null>;
+  abstract getTickers(): Promise<TickerModel[] | null>;
 
   abstract getTickersFlatData(): Promise<TickerFlatData[] | null>;
 

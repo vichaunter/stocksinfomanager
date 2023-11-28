@@ -1,10 +1,9 @@
 import pc from "picocolors";
 import TickerModel from "../models/tickerModel";
-import database from "./database";
-import { Browser } from "puppeteer";
-import * as scraperHandlers from "./scraper/handlers";
-import { browser } from "./browser";
 import { ScraperHandler } from "../types";
+import { browser } from "./browser";
+import database from "./database";
+import * as scraperHandlers from "./scraper/handlers";
 
 type TickerToUpdateHandler = (ticker: TickerModel) => void;
 
@@ -64,7 +63,10 @@ const updateTicker = async (item: QueueItem) => {
 
             throw Error("Data not found");
           } catch (error) {
-              await database.saveTickerError(item, {name: error.name, message: error.message})
+            await database.saveTickerError(item, {
+              name: error.name,
+              message: error.message,
+            });
             return reject(error);
           }
         });
@@ -154,7 +156,7 @@ const loadStoredTickers = async () => {
 
   const tickersWithoutErrors = tickers.filter((t) => !t.tickerData && !t.error);
   const validTickers = tickers.filter((t) => t.tickerData && !t.error);
-  
+
   console.log("TICKERS", tickersWithoutErrors.length, validTickers.length);
 
   [...tickersWithoutErrors, ...validTickers].forEach((ticker) => {

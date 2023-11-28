@@ -39,24 +39,7 @@ class MongoDBDatabaseHandler extends DatabaseHandler_1.default {
     async getTickers({ historical = false, financials = false, dividends = false, } = {}) {
         const result = await this.prisma.ticker.findMany({
             include: {
-                tickerData: {
-                    select: {
-                        price: true,
-                        dividend: true,
-                        dividendYield: true,
-                        dividend5YearGrowhthRate: true,
-                        dividendYearsGrowhth: true,
-                        dividendPayoutRatio: true,
-                        dividendFrequency: true,
-                        lastExDate: true,
-                        lastPayoutDate: true,
-                        nextPayDate: true,
-                        nextExDate: true,
-                        financials,
-                        dividends,
-                        historical
-                    }
-                },
+                tickerData: true,
                 tickerHandlers: true,
             },
         });
@@ -116,7 +99,7 @@ class MongoDBDatabaseHandler extends DatabaseHandler_1.default {
                 where: { id: ticker.id },
                 data: {
                     updatedAt: new Date(),
-                    error
+                    error,
                 },
             });
             await this.saveHandlers(ticker);

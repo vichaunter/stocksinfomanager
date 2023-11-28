@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sleep = exports.formatDate = exports.parseDate = exports.cleanNumber = exports.camelizeText = exports.ucFirstAll = exports.lcFirst = exports.ucFirst = void 0;
+exports.getDividendPercentage = exports.sleep = exports.formatDate = exports.parseDate = exports.cleanNumber = exports.camelizeText = exports.ucFirstAll = exports.lcFirst = exports.ucFirst = void 0;
 const dayjs_1 = __importDefault(require("dayjs"));
 const system_locale_1 = __importDefault(require("system-locale"));
 const picocolors_1 = __importDefault(require("picocolors"));
@@ -25,10 +25,10 @@ const camelizeText = (str) => {
 };
 exports.camelizeText = camelizeText;
 const cleanNumber = (str) => {
-    return str.replace(/[^0-9\.\%]/g, "");
+    return str.replace(/[^0-9\.\% ]/g, "");
 };
 exports.cleanNumber = cleanNumber;
-const parseDate = (str) => (0, dayjs_1.default)(str, ["MMM DD, YYYY", "DD MMM YYYY"]);
+const parseDate = (str) => (0, dayjs_1.default)(str, ["MMM DD, YYYY", "DD MMM YYYY", "YYYY-MM-DD"]);
 exports.parseDate = parseDate;
 const formatDate = (date, format) => {
     const isDateString = typeof date === "string";
@@ -39,8 +39,12 @@ const formatDate = (date, format) => {
     else {
         dayjsDate = date;
     }
-    return dayjsDate.format(format ?? "DD/MM/YYYY");
+    return dayjsDate.format();
 };
 exports.formatDate = formatDate;
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 exports.sleep = sleep;
+const getDividendPercentage = (price, dividend) => {
+    return (dividend / price) * 100;
+};
+exports.getDividendPercentage = getDividendPercentage;

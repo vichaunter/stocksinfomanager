@@ -26,11 +26,11 @@ export const camelizeText = (str: string) => {
 };
 
 export const cleanNumber = (str: string) => {
-  return str.replace(/[^0-9\.\%]/g, "");
+  return str.replace(/[^0-9\.\% ]/g, "");
 };
 
 export const parseDate = (str: string): Dayjs =>
-  dayjs(str, ["MMM DD, YYYY", "DD MMM YYYY"]);
+  dayjs(str, ["MMM DD, YYYY", "DD MMM YYYY", "YYYY-MM-DD"]);
 
 export const formatDate = (date: string | Dayjs, format?): string => {
   const isDateString = typeof date === "string";
@@ -41,8 +41,12 @@ export const formatDate = (date: string | Dayjs, format?): string => {
     dayjsDate = date;
   }
 
-  return dayjsDate.format(format ?? "DD/MM/YYYY");
+  return dayjsDate.format();
 };
 
 export const sleep = (ms: number) =>
   new Promise((resolve) => setTimeout(resolve, ms));
+
+export const getDividendPercentage = (price, dividend) => {
+  return (dividend / price) * 100;
+};

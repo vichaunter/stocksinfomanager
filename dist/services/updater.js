@@ -28,9 +28,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const picocolors_1 = __importDefault(require("picocolors"));
 const tickerModel_1 = __importDefault(require("../models/tickerModel"));
+const browser_1 = require("./browser");
 const database_1 = __importDefault(require("./database"));
 const scraperHandlers = __importStar(require("./scraper/handlers"));
-const browser_1 = require("./browser");
 const queue = [];
 const getTickerData = async ({ item, url, parser }) => {
     let parsed;
@@ -69,7 +69,10 @@ const updateTicker = async (item) => {
                     throw Error("Data not found");
                 }
                 catch (error) {
-                    await database_1.default.saveTickerError(item, { name: error.name, message: error.message });
+                    await database_1.default.saveTickerError(item, {
+                        name: error.name,
+                        message: error.message,
+                    });
                     return reject(error);
                 }
             });

@@ -1,9 +1,11 @@
+"use strict";
 // import pc from "picocolors";
 // import fs from "node:fs";
 // import path from "node:path";
 // import { PATHS } from "../../constants";
 // import TickerModel from "../../models/tickerModel";
 // import DatabaseHandler from "./DatabaseHandler";
+Object.defineProperty(exports, "__esModule", { value: true });
 // class FilesystemDatabaseHandler extends DatabaseHandler {
 //   async init() {
 //     console.log("!!!!!!!!!!!!!!!init");

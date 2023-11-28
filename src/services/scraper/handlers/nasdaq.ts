@@ -1,10 +1,10 @@
+import dayjs from "dayjs";
 import ScraperError from "../../../errors/scraperError";
 import TickerModel from "../../../models/tickerModel";
 import { ScraperHandler } from "../../../types";
 import { sleep } from "../../../utils";
-import dayjs, { Dayjs } from "dayjs";
 
-const name = "nasdaqfinancials";
+const name = "nasdaq";
 const baseUrl = `https://www.nasdaq.com`;
 const apiUrl = `https://api.nasdaq.com/api`;
 // https://api.nasdaq.com/api/quote/TEF/historical?assetclass=stocks&fromdate=1900-01-01&limit=99999&todate=2023-11-12
@@ -34,7 +34,7 @@ const fetchData = async ({
     console.log(urls[endpoint]);
     data[endpoint] = await fetch(urls[endpoint])
       .then((res) => res.json())
-      .then((data) => data.data);
+      .then((data: any) => data?.data);
 
     await sleep(1000);
   }

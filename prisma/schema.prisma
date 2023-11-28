@@ -26,6 +26,7 @@ model TickerData {
   price                    String
   dividend                 String?
   dividendYield            String?
+  dividendAnnualized       String?
   dividend5YearGrowhthRate String?
   dividendYearsGrowhth     String?
   dividendPayoutRatio      String?

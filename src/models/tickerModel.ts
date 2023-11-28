@@ -17,13 +17,14 @@ export type TickerFlatData = {
 class TickerModel {
   id: string; // dbId
   symbol: string;
-  error: any
+  error: any;
   updatedAt: Date;
   tickerHandlers: TickerHandler[];
   tickerData: TickerData | null = {
     id: null,
     dividend: null,
     dividendYield: null,
+    dividendAnnualized: null,
     dividend5YearGrowhthRate: null,
     dividendFrequency: null,
     dividendPayoutRatio: null,
@@ -125,9 +126,9 @@ class TickerModel {
     return this;
   }
 
-  async saveError(error: any){
-    this.error = error
-    await database.saveTicker(this)
+  async saveError(error: any) {
+    this.error = error;
+    await database.saveTicker(this);
   }
 
   async saveTicker() {

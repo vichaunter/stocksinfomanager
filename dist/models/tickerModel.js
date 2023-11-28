@@ -35,6 +35,7 @@ class TickerModel {
             id: null,
             dividend: null,
             dividendYield: null,
+            dividendAnnualized: null,
             dividend5YearGrowhthRate: null,
             dividendFrequency: null,
             dividendPayoutRatio: null,
