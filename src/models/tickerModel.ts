@@ -4,43 +4,34 @@ import database from "../services/database";
 import { ScraperHandler, SortMode } from "../types";
 import * as scraperHandlers from "../services/scraper/handlers";
 
-export type TickerFlatData = {
-  id: string;
-  symbol: string;
-  data: {
-    price: string;
-    dividend: string;
-    dividendYield: string;
-  };
-};
-
 class TickerModel {
-  id: string; // dbId
-  symbol: string;
-  error: any;
-  updatedAt: Date;
-  tickerHandlers: TickerHandler[];
-  tickerData: TickerData | null = {
-    id: null,
-    dividend: null,
-    dividendYield: null,
-    dividendAnnualized: null,
-    dividend5YearGrowhthRate: null,
-    dividendFrequency: null,
-    dividendPayoutRatio: null,
-    dividendYearsGrowhth: null,
-    lastExDate: null,
-    lastPayoutDate: null,
-    nextExDate: null,
-    nextPayDate: null,
-    price: null,
-    tickerId: null,
-    financials: "",
-    dividends: "",
-    historical: "",
-  };
+  id?: string; // dbId
 
-  constructor(ticker: Ticker) {
+  symbol: string;
+  price?: null;
+
+  dividendYield?: string;
+  dividendAnnualPayout?: string;
+  dividendPayoutRatio?: string;
+  dividend5YearGrowhthRate?: string;
+  dividendYearsGrowhth?: string;
+  dividendAmount?: string;
+  dividendExDate?: null;
+  dividendPayoutDate?: null;
+  dividendRecordDate?: null;
+  dividendDeclareDate?: null;
+  dividendFrequency?: null;
+  nextExDate?: null;
+  nextPayDate?: null;
+  //sector
+  //industria
+
+  error?: any;
+  updatedAt?: Date;
+
+  handlers: TickerHandler[] = [];
+
+  constructor(ticker: Omit<Ticker, "id">) {
     Object.assign(this, ticker);
     this.updatedAt = new Date(ticker.updatedAt);
 
@@ -48,10 +39,22 @@ class TickerModel {
   }
 
   invalidate() {
-    this.tickerData = undefined;
+    console.warn("invalidate not implemented...");
+    // this.tickerData = undefined;
+  }
+
+  getRawData() {
+    //TODO: return the raw data for given ticker
+    // raw?: {
+    //   financials: "";
+    //   dividends: "";
+    //   historical: "";
+    // };
+    return {};
   }
 
   getDefaultHandlers() {
+    console.log("getDefaultHandlers...");
     return this.getHandlersWithDefault().map((d) => ({
       id: d.name,
       tickerId: this.id,
@@ -66,7 +69,12 @@ class TickerModel {
     //   this.data = await database.getTicker(this.symbol);
     // }
 
-    return this.tickerData;
+    return {
+      ...this,
+      financials: undefined,
+      dividends: undefined,
+      historical: undefined,
+    };
   }
 
   async getKeyData(key: string): Promise<string | undefined> {
@@ -94,10 +102,6 @@ class TickerModel {
     return database.getTickers();
   }
 
-  static async getTickersFlatData(): Promise<TickerFlatData[] | null> {
-    return database.getTickersFlatData();
-  }
-
   // static sortByMTime(
   //   tickers: TickerModel["symbol"][],
   //   mode: SortMode = SortMode.desc
@@ -120,8 +124,11 @@ class TickerModel {
   //     .map((file) => file.fileName);
   // }
 
-  setData(data: TickerModel["tickerData"]) {
-    this.tickerData = { ...this.tickerData, ...data };
+  setData(data: TickerModel) {
+    Object.assign(this, {
+      ...this,
+      ...data,
+    });
 
     return this;
   }
@@ -133,7 +140,8 @@ class TickerModel {
 
   async saveTicker() {
     try {
-      if (this.symbol && this.id && this.tickerData) {
+      if (this.symbol) {
+        if (!this.id) this.id = this.symbol;
         await database.saveTicker(this);
       }
 
@@ -154,6 +162,7 @@ class TickerModel {
   }
 
   getHandlersWithDefault(): ScraperHandler[] {
+    console.log({ scraperHandlers });
     return Object.values(scraperHandlers).filter((h) => h.defaultHandler);
   }
 }
