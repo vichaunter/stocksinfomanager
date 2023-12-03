@@ -3,7 +3,6 @@ import fs from "node:fs";
 import path from "node:path";
 import pp from "puppeteer-extra";
 import StealthPlugin from "puppeteer-extra-plugin-stealth";
-import { load as cheerioLoad } from "cheerio";
 import request from "request";
 
 /*
@@ -26,6 +25,13 @@ Type 10 - Cryptocurrencies:
 
 This type includes various cryptocurrencies like BTC (Bitcoin), ETH (Ethereum), and ADA (Cardano).
 */
+
+//Instruments
+const INSTRUMENTS_URL =
+  "https://api.etorostatic.com/sapi/instrumentsmetadata/V1.1/instruments/bulk?bulkNumber=1&totalBulks=1";
+
+//Instruments rates
+const INSTRUMENTSDATA_URL = `https://www.etoro.com/sapi/trade-real/instruments?InstrumentDataFilters=Activity,Rates,ActivityInExchange`;
 
 async function isValidTicker(url, browser) {
   const page = await browser.newPage();
@@ -50,31 +56,44 @@ async function init() {
   });
 
   const instruments = fs.readFileSync(
-    path.join(__dirname, "etoroInstruments.json"),
+    path.join(__dirname, "etoroInstrumentsRaw.json"),
     "utf-8"
   );
 
   const { InstrumentDisplayDatas } = JSON.parse(instruments);
-  
-  for (const instrument of InstrumentDisplayDatas.filter((ins) => ins.InstrumentTypeID === 5)) {
-    if(!instrument.SymbolFull) continue
 
-    const url = `https://www.etoro.com/markets/${instrument.SymbolFull.toLowerCase()}`
-    const isValid = await isValidTicker(
-      url,
-      browser
-    );
-    console.log(isValid, url)
+  for (const instrument of InstrumentDisplayDatas.filter(
+    (ins) => ins.InstrumentTypeID === 5
+  )) {
+    if (!instrument.SymbolFull) continue;
+
+    const url = `https://www.etoro.com/markets/${instrument.SymbolFull.toLowerCase()}`;
+    const isValid = await isValidTicker(url, browser);
+    console.log(isValid, url);
     if (isValid) {
       request(
         {
-          url: "http://localhost:4000/ticker",
-          method: "PUT",
+          url: "http://localhost:4000/graphql", // Replace with your GraphQL server endpoint
+          method: "POST",
           json: true,
-          body: { symbol: instrument.SymbolFull },
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: {
+            query: `
+              mutation CreateTicker($symbol: String!) {
+                createTicker(symbol: $symbol) {
+                  symbol
+                }
+              }
+            `,
+            variables: {
+              symbol: instrument.SymbolFull,
+            },
+          },
         },
         function (error, response, body) {
-          console.log(error);
+          console.log(error, body);
         }
       );
     }
@@ -82,5 +101,38 @@ async function init() {
 
   browser.close();
 }
+
+const downloadData = async () => {
+  pp.use(StealthPlugin());
+  const browser = await pp.launch({
+    headless: "new",
+  });
+
+  try {
+    const instruments = await browser.newPage();
+    await instruments.goto(INSTRUMENTS_URL, { waitUntil: "networkidle0" });
+    const source = await instruments.content();
+    fs.writeFileSync(
+      path.join(__dirname, "etoroInstrumentsRaw.json"),
+      source.replace(/(<([^>]+)>)/gi, "")
+    );
+    instruments.close();
+
+    const instrumentsData = await browser.newPage();
+    await instrumentsData.goto(INSTRUMENTSDATA_URL, {
+      waitUntil: "networkidle0",
+    });
+    const sourceData = await instrumentsData.content();
+    fs.writeFileSync(
+      path.join(__dirname, "etoroInstrumentsDataRaw.json"),
+      sourceData.replace(/(<([^>]+)>)/gi, "")
+    );
+    instrumentsData.close();
+  } catch (error) {
+    console.log("Error occured:", error.message);
+  }
+
+  browser.close();
+};
 
 init();
