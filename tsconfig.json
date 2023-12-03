@@ -1,10 +1,13 @@
 {
   "compilerOptions": {
+    "lib": ["es2020", "DOM"],
     "target": "es2020" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
-    "module": "CommonJS" /* Specify what module code is generated. */,
+    "module": "NodeNext" /* Specify what module code is generated. */,
     "rootDir": "./src" /* Specify the root folder within your source files. */,
     "outDir": "./dist" /* Specify an output folder for all emitted files. */,
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "moduleResolution": "NodeNext",
+    "types": ["node", "puppeteer"]
   },
   "include": ["src/**/*.ts"]
 }
