@@ -8,6 +8,9 @@ const picocolors_1 = __importDefault(require("picocolors"));
 const tickerModel_1 = __importDefault(require("../../models/tickerModel"));
 const DatabaseHandler_1 = __importDefault(require("./DatabaseHandler"));
 class MongoDBDatabaseHandler extends DatabaseHandler_1.default {
+    getRawTicker(symbol) {
+        throw new Error("Method not implemented.");
+    }
     async init() {
         console.log("Init mongoDb");
         this.prisma = new client_1.PrismaClient(process.env.DEBUG && {
@@ -45,33 +48,33 @@ class MongoDBDatabaseHandler extends DatabaseHandler_1.default {
         });
         return result.map((t) => new tickerModel_1.default(t));
     }
-    async getTickersFlatData() {
-        const result = await this.getTickers();
-        const flat = result.map((item) => {
-            let data;
-            if (item.tickerData) {
-                const { id, tickerId, ...tickerData } = item.tickerData;
-                data = tickerData;
-            }
-            return {
-                id: item.id,
-                symbol: item.symbol,
-                error: item.error,
-                data,
-            };
-        });
-        return flat;
-    }
+    // async getTickersFlatData(): Promise<TickerFlatData[] | null> {
+    //   const result = await this.getTickers();
+    //   const flat = result.map((item) => {
+    //     let data;
+    //     if (item.tickerData) {
+    //       const { id, tickerId, ...tickerData } = item.tickerData;
+    //       data = tickerData;
+    //     }
+    //     return {
+    //       id: item.id,
+    //       symbol: item.symbol,
+    //       error: item.error,
+    //       data,
+    //     };
+    //   });
+    //   return flat;
+    // }
     async getTickersList() {
         //mongodb ticker list table
         const result = await this.prisma.ticker.findMany();
         return result.map((ticker) => ticker.symbol);
     }
     async saveHandlers(ticker) {
-        if (ticker.tickerHandlers.length < 1)
+        if (ticker.handlers.length < 1)
             return true;
         try {
-            for (const handler of ticker.tickerHandlers) {
+            for (const handler of ticker.handlers) {
                 await this.prisma.tickerHandler.upsert({
                     where: { id: handler.id },
                     update: {
@@ -113,23 +116,23 @@ class MongoDBDatabaseHandler extends DatabaseHandler_1.default {
     }
     async saveTicker(ticker) {
         try {
-            if (!ticker.tickerData.price)
+            if (!ticker.price)
                 throw Error(`Price missing for ticker ${ticker.symbol} Skipping...`);
-            if (Object.keys(ticker.tickerData).length < 1)
+            if (Object.keys(ticker).length < 1)
                 throw Error(picocolors_1.default.yellow(`Data was not provider to save [${ticker}]`));
-            const { id, tickerId, ...tickerDataWithoutId } = ticker.tickerData;
-            process.env.DEBUG && console.log("tickerData:", ticker.tickerData);
+            const { id, ...tickerDataWithoutId } = ticker;
+            process.env.DEBUG && console.log("tickerData:", ticker);
             const update = this.prisma.ticker.update({
                 where: { id: ticker.id },
                 data: {
                     updatedAt: new Date(),
-                    tickerData: {
-                        upsert: {
-                            where: { tickerId: ticker.id },
-                            update: tickerDataWithoutId,
-                            create: tickerDataWithoutId,
-                        },
-                    },
+                    // tickerData: {
+                    //   upsert: {
+                    //     where: { tickerId: ticker.id },
+                    //     update: tickerDataWithoutId,
+                    //     create: tickerDataWithoutId,
+                    //   },
+                    // },
                 },
             });
             await this.saveHandlers(ticker);
@@ -155,6 +158,9 @@ class MongoDBDatabaseHandler extends DatabaseHandler_1.default {
             });
         }
         return ticker;
+    }
+    saveRaw(handler, symbol, data) {
+        console.warn("saveRaw not implemented...");
     }
 }
 exports.default = MongoDBDatabaseHandler;

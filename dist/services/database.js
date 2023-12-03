@@ -16,11 +16,11 @@ class Database {
     async getTicker(ticker) {
         return this.handler.getTicker(ticker);
     }
+    async getRawTicker(symbol) {
+        return this.handler.getRawTicker(symbol);
+    }
     async getTickers() {
         return this.handler.getTickers();
-    }
-    async getTickersFlatData() {
-        return this.handler.getTickersFlatData();
     }
     async getTickersList() {
         return this.handler.getTickersList();
@@ -36,6 +36,9 @@ class Database {
     }
     async addTicker(symbol) {
         return this.handler.addTicker(symbol);
+    }
+    saveRaw(handler, symbol, data) {
+        this.handler.saveRaw(handler, symbol, data);
     }
 }
 const database = new Database(new index_1.handlers[process.env.DB_HANDLER]());

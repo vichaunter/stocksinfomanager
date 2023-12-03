@@ -32,7 +32,7 @@ const getTicker = (req, res) => {
     });
 };
 const getTickers = async (_, res) => {
-    const tickers = await tickerModel_1.default.getTickersFlatData();
+    const tickers = await tickerModel_1.default.getTickers();
     return res.status(200).send(tickers ?? []);
 };
 const addTicker = async (req, res) => {

@@ -33,30 +33,35 @@ const database_1 = __importDefault(require("./database"));
 const scraperHandlers = __importStar(require("./scraper/handlers"));
 const queue = [];
 const getTickerData = async ({ item, url, parser }) => {
-    let parsed;
-    if (parser.mode === "standalone") {
-        const source = await browser_1.browser.getPageSourceHtml(url);
-        parsed = parser.parse(source);
+    try {
+        let parsed;
+        if (parser.mode === "standalone") {
+            const source = await browser_1.browser.getPageSourceHtml(url);
+            parsed = parser.parse(source);
+        }
+        else {
+            parsed = await parser.fetch({ item, url });
+        }
+        console.log(picocolors_1.default.blue(parser.name), picocolors_1.default.green(url));
+        console.log("parsed:", item.symbol);
+        console.log(``);
+        return parsed;
     }
-    else {
-        parsed = await parser.fetch({ item, url });
+    catch (e) {
+        console.log("Error fetching:", item.symbol, url);
+        console.log(e);
     }
-    console.log(picocolors_1.default.blue(parser.name), picocolors_1.default.green(url));
-    console.log("parsed:", item.symbol);
-    console.log(``);
-    return parsed;
 };
 const updateTicker = async (item) => {
     try {
-        process.env.DEBUG &&
-            console.log("updateTicker_handlers:", item.tickerHandlers);
-        const promises = [...item.tickerHandlers, ...item.getDefaultHandlers()]
+        process.env.DEBUG && console.log("updateTicker_handlers:", item.handlers);
+        const promises = [...(item.handlers || []), ...item.getDefaultHandlers()]
             .filter((h) => h.enabled) //remove disabled handlers
             .map((handler) => {
             return new Promise(async (resolve, reject) => {
                 const parser = scraperHandlers?.[handler.id];
                 if (!parser || !handler.url)
-                    return reject(new Error(`Missing parser or handler url for ${item.symbol}`));
+                    return reject(new Error(`Missing parser or handler [${handler.id}] url for ${item.symbol}`));
                 try {
                     const data = await getTickerData({
                         item,
@@ -148,8 +153,8 @@ const loadStoredTickers = async () => {
     const tickers = await tickerModel_1.default.getTickers();
     //pick older updated first
     tickers.sort((a, b) => a.updatedAt - b.updatedAt);
-    const tickersWithoutErrors = tickers.filter((t) => !t.tickerData && !t.error);
-    const validTickers = tickers.filter((t) => t.tickerData && !t.error);
+    const tickersWithoutErrors = tickers.filter((t) => !t.price && !t.error);
+    const validTickers = tickers.filter((t) => t.price && !t.error);
     console.log("TICKERS", tickersWithoutErrors.length, validTickers.length);
     [...tickersWithoutErrors, ...validTickers].forEach((ticker) => {
         queue.push(ticker);

@@ -13,5 +13,7 @@ exports.PATHS = {
     base: BASE_PATH,
     data: node_path_1.default.join(BASE_PATH, "data"),
     tickers: node_path_1.default.join(BASE_PATH, "data", "tickers"),
+    raw: node_path_1.default.join(BASE_PATH, "data", "raw"),
     tickerFile: (ticker) => node_path_1.default.join(BASE_PATH, "data", "tickers", `${ticker}.json`),
+    rawFile: (symbol, extension = null) => node_path_1.default.join(BASE_PATH, "data", "raw", `${symbol}${extension ? `.${extension}` : ""}`),
 };

@@ -1,12 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const typeDefs = `#graphql
+    scalar JSON
 
     type Ticker { 
         id:         String
         symbol:     String
-        tickerData: TickerData
-        error:      String
+        price:      Float
+        dividendYield: Float
+        dividendAnnualPayout: Float
+        dividendPayoutRatio: Float
+        dividend5YearGrowhthRate: Float
+        dividendYearsGrowhth: Float
+        dividendAmount: Float
+        dividendExDate: String
+        dividendPayoutDate: String
+        dividendRecordDate: String
+        dividendDeclareDate: String
+        dividendFrequency: String
+        nextExDate: String
+        nextPayDate: String
+        error:      JSON
         updatedAt:  String
     }
 
@@ -26,9 +40,28 @@ const typeDefs = `#graphql
         nextExDate:               String
     }
 
+    type TickerRaw {
+        finviz: JSON
+        nasdaq: JSON
+        seekingalpha: JSON
+    }
+
     type Query {
         ticker(symbol: String!): Ticker!
         tickers: [Ticker]
+        rawTicker(symbol: String!) : TickerRaw
+    }
+
+    input TickerInput {
+        id:         String
+        symbol:     String
+        error:      String
+        updatedAt:  String
+    }
+
+    type Mutation {
+        createTicker(symbol: String!) : Ticker
+        updateTicker(symbol: String!) : Ticker
     }
 
 `;

@@ -9,6 +9,7 @@ const scraperError_1 = __importDefault(require("../../../errors/scraperError"));
 const scraperHandlerError_1 = __importDefault(require("../../../errors/scraperHandlerError"));
 const utils_1 = require("../../../utils");
 const browser_1 = require("../../browser");
+const database_1 = __importDefault(require("../../database"));
 const name = "finviz";
 const baseUrl = `https://finviz.com`;
 const validKeys = ["price", "dividend", "dividendYield"];
@@ -114,13 +115,13 @@ const parse = (source) => {
         }
         rows.push(rowData);
     });
-    console.log(mapped);
     return mapped;
 };
 const fetchData = async ({ item }) => {
     const url = tickerUrl(item.symbol);
     const html = await browser_1.browser.getPageSourceHtml(url);
-    return parse(html);
+    database_1.default.saveRaw(name, item.symbol, parse(html));
+    return {};
 };
 const tickerUrl = (ticker) => `${baseUrl}/quote.ashx?t=${ticker}`;
 const defaultHandler = async (symbol) => {

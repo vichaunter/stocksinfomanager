@@ -20,12 +20,14 @@ class Database {
     return this.handler.getTicker(ticker);
   }
 
-  async getTickers(): Promise<TickerModel[] | null> {
-    return this.handler.getTickers();
+  async getRawTicker(
+    symbol: TickerModel["symbol"]
+  ): Promise<Record<string, any> | null> {
+    return this.handler.getRawTicker(symbol);
   }
 
-  async getTickersFlatData() {
-    return this.handler.getTickersFlatData();
+  async getTickers(): Promise<TickerModel[] | null> {
+    return this.handler.getTickers();
   }
 
   async getTickersList(): Promise<string[]> {
@@ -46,6 +48,10 @@ class Database {
 
   async addTicker(symbol: string): Promise<Ticker> {
     return this.handler.addTicker(symbol);
+  }
+
+  saveRaw(handler: string, symbol: string, data: any): void {
+    this.handler.saveRaw(handler, symbol, data);
   }
 }
 

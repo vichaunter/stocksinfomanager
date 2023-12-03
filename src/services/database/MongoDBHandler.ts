@@ -1,9 +1,12 @@
 import { PrismaClient, TickerHandler } from "@prisma/client";
 import pc from "picocolors";
-import TickerModel, { TickerFlatData } from "../../models/tickerModel";
+import TickerModel from "../../models/tickerModel";
 import DatabaseHandler, { DbGetTickersParams } from "./DatabaseHandler";
 
 class MongoDBDatabaseHandler extends DatabaseHandler {
+  getRawTicker(symbol: string): Promise<Record<string, any>> {
+    throw new Error("Method not implemented.");
+  }
   prisma: PrismaClient;
 
   async init() {
@@ -56,24 +59,24 @@ class MongoDBDatabaseHandler extends DatabaseHandler {
     return result.map((t) => new TickerModel(t));
   }
 
-  async getTickersFlatData(): Promise<TickerFlatData[] | null> {
-    const result = await this.getTickers();
-    const flat = result.map((item) => {
-      let data;
-      if (item.tickerData) {
-        const { id, tickerId, ...tickerData } = item.tickerData;
-        data = tickerData;
-      }
-      return {
-        id: item.id,
-        symbol: item.symbol,
-        error: item.error,
-        data,
-      };
-    });
+  // async getTickersFlatData(): Promise<TickerFlatData[] | null> {
+  //   const result = await this.getTickers();
+  //   const flat = result.map((item) => {
+  //     let data;
+  //     if (item.tickerData) {
+  //       const { id, tickerId, ...tickerData } = item.tickerData;
+  //       data = tickerData;
+  //     }
+  //     return {
+  //       id: item.id,
+  //       symbol: item.symbol,
+  //       error: item.error,
+  //       data,
+  //     };
+  //   });
 
-    return flat;
-  }
+  //   return flat;
+  // }
 
   async getTickersList(): Promise<string[]> {
     //mongodb ticker list table
@@ -83,10 +86,10 @@ class MongoDBDatabaseHandler extends DatabaseHandler {
   }
 
   async saveHandlers(ticker: TickerModel): Promise<boolean> {
-    if (ticker.tickerHandlers.length < 1) return true;
+    if (ticker.handlers.length < 1) return true;
 
     try {
-      for (const handler of ticker.tickerHandlers) {
+      for (const handler of ticker.handlers) {
         await this.prisma.tickerHandler.upsert({
           where: { id: handler.id },
           update: {
@@ -134,25 +137,25 @@ class MongoDBDatabaseHandler extends DatabaseHandler {
 
   async saveTicker(ticker: TickerModel): Promise<boolean> {
     try {
-      if (!ticker.tickerData.price)
+      if (!ticker.price)
         throw Error(`Price missing for ticker ${ticker.symbol} Skipping...`);
 
-      if (Object.keys(ticker.tickerData).length < 1)
+      if (Object.keys(ticker).length < 1)
         throw Error(pc.yellow(`Data was not provider to save [${ticker}]`));
 
-      const { id, tickerId, ...tickerDataWithoutId } = ticker.tickerData;
-      process.env.DEBUG && console.log("tickerData:", ticker.tickerData);
+      const { id, ...tickerDataWithoutId } = ticker;
+      process.env.DEBUG && console.log("tickerData:", ticker);
       const update = this.prisma.ticker.update({
         where: { id: ticker.id },
         data: {
           updatedAt: new Date(),
-          tickerData: {
-            upsert: {
-              where: { tickerId: ticker.id },
-              update: tickerDataWithoutId,
-              create: tickerDataWithoutId,
-            },
-          },
+          // tickerData: {
+          //   upsert: {
+          //     where: { tickerId: ticker.id },
+          //     update: tickerDataWithoutId,
+          //     create: tickerDataWithoutId,
+          //   },
+          // },
         },
       });
 
@@ -183,6 +186,10 @@ class MongoDBDatabaseHandler extends DatabaseHandler {
     }
 
     return ticker;
+  }
+
+  saveRaw(handler: string, symbol: string, data: any): void {
+    console.warn("saveRaw not implemented...");
   }
 }
 
