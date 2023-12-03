@@ -17,27 +17,31 @@ type GetTickerDataProps = {
   parser: ScraperHandler;
 };
 const getTickerData = async ({ item, url, parser }: GetTickerDataProps) => {
-  let parsed;
-  if (parser.mode === "standalone") {
-    const source = await browser.getPageSourceHtml(url);
-    parsed = parser.parse(source);
-  } else {
-    parsed = await parser.fetch({ item, url });
+  try {
+    let parsed;
+    if (parser.mode === "standalone") {
+      const source = await browser.getPageSourceHtml(url);
+      parsed = parser.parse(source);
+    } else {
+      parsed = await parser.fetch({ item, url });
+    }
+
+    console.log(pc.blue(parser.name), pc.green(url));
+    console.log("parsed:", item.symbol);
+    console.log(``);
+
+    return parsed;
+  } catch (e) {
+    console.log("Error fetching:", item.symbol, url);
+    console.log(e);
   }
-
-  console.log(pc.blue(parser.name), pc.green(url));
-  console.log("parsed:", item.symbol);
-  console.log(``);
-
-  return parsed;
 };
 
 const updateTicker = async (item: QueueItem) => {
   try {
-    process.env.DEBUG &&
-      console.log("updateTicker_handlers:", item.tickerHandlers);
+    process.env.DEBUG && console.log("updateTicker_handlers:", item.handlers);
 
-    const promises = [...item.tickerHandlers, ...item.getDefaultHandlers()]
+    const promises = [...(item.handlers || []), ...item.getDefaultHandlers()]
       .filter((h) => h.enabled) //remove disabled handlers
       .map((handler) => {
         return new Promise<{
@@ -47,7 +51,9 @@ const updateTicker = async (item: QueueItem) => {
           const parser = scraperHandlers?.[handler.id];
           if (!parser || !handler.url)
             return reject(
-              new Error(`Missing parser or handler url for ${item.symbol}`)
+              new Error(
+                `Missing parser or handler [${handler.id}] url for ${item.symbol}`
+              )
             );
 
           try {
@@ -154,8 +160,8 @@ const loadStoredTickers = async () => {
   //pick older updated first
   tickers.sort((a, b) => (a.updatedAt as any) - (b.updatedAt as any));
 
-  const tickersWithoutErrors = tickers.filter((t) => !t.tickerData && !t.error);
-  const validTickers = tickers.filter((t) => t.tickerData && !t.error);
+  const tickersWithoutErrors = tickers.filter((t) => !t.price && !t.error);
+  const validTickers = tickers.filter((t) => t.price && !t.error);
 
   console.log("TICKERS", tickersWithoutErrors.length, validTickers.length);
 

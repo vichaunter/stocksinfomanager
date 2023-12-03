@@ -5,6 +5,7 @@ import ScraperHandlerError from "../../../errors/scraperHandlerError";
 import { ScraperHandler } from "../../../types";
 import { camelizeText } from "../../../utils";
 import { browser } from "../../browser";
+import database from "../../database";
 
 const name = "finviz";
 const baseUrl = `https://finviz.com`;
@@ -96,8 +97,8 @@ const parse = (source: string): Record<string, string> => {
   const rows = [];
   const mapped = {};
   const data = $(".screener_snapshot-table-wrapper table  tr");
-  if (!data.length) throw new ScraperHandlerError(name, "DATA_NOT_FOUND")
-  
+  if (!data.length) throw new ScraperHandlerError(name, "DATA_NOT_FOUND");
+
   //ScraperError(`Invalid handler ${name}: Data not found`);
 
   data.each((i, row) => {
@@ -117,7 +118,7 @@ const parse = (source: string): Record<string, string> => {
     }
     rows.push(rowData);
   });
-  console.log(mapped);
+
   return mapped;
 };
 
@@ -125,7 +126,9 @@ const fetchData = async ({ item }) => {
   const url = tickerUrl(item.symbol);
   const html = await browser.getPageSourceHtml(url);
 
-  return parse(html);
+  database.saveRaw(name, item.symbol, parse(html));
+
+  return {};
 };
 
 const tickerUrl = (ticker: string) => `${baseUrl}/quote.ashx?t=${ticker}`;
