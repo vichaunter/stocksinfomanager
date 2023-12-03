@@ -26,7 +26,8 @@ export const camelizeText = (str: string) => {
 };
 
 export const cleanNumber = (str: string) => {
-  return str.replace(/[^0-9\.\% ]/g, "");
+  if (!str) return str;
+  return parseFloat(str.replace(/[^0-9\.\%\- ]/g, ""));
 };
 
 export const parseDate = (str: string): Dayjs =>
@@ -49,4 +50,15 @@ export const sleep = (ms: number) =>
 
 export const getDividendPercentage = (price, dividend) => {
   return (dividend / price) * 100;
+};
+
+export const sortObjByKeys = (obj: Record<string, any>) => {
+  const sorted = {};
+  Object.keys(obj)
+    .sort()
+    .forEach((k) => {
+      sorted[k] = obj[k];
+    });
+
+  return sorted;
 };

@@ -35,7 +35,7 @@ const getTicker: RouteHanlder = (req, res) => {
 };
 
 const getTickers: RouteHanlder = async (_, res) => {
-  const tickers = await TickerModel.getTickersFlatData();
+  const tickers = await TickerModel.getTickers();
 
   return res.status(200).send(tickers ?? []);
 };
