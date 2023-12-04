@@ -41,7 +41,7 @@ const parse = (source: string): Record<string, string> => {
   return { nextExDate: mappedDates[0] };
 };
 
-const scraperHandler: ScraperHandler = {
+const scraperHandler: ScraperHandler<any> = {
   name,
   baseUrl,
   tickerUrl,

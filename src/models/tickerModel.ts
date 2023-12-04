@@ -1,26 +1,27 @@
 import { Ticker, TickerData, TickerHandler } from "@prisma/client";
 import pc from "picocolors";
 import database from "../services/database";
-import { ScraperHandler, SortMode } from "../types";
+import { HandlersData, ScraperHandler, SortMode } from "../types";
 import * as scraperHandlers from "../services/scraper/handlers";
+import { cleanNumber, formatDate } from "../utils";
 
 class TickerModel {
   id?: string; // dbId
 
   symbol: string;
-  price?: null;
+  price?: number;
 
-  dividendYield?: string;
-  dividendAnnualPayout?: string;
-  dividendPayoutRatio?: string;
-  dividend5YearGrowhthRate?: string;
-  dividendYearsGrowhth?: string;
-  dividendAmount?: string;
-  dividendExDate?: null;
-  dividendPayoutDate?: null;
-  dividendRecordDate?: null;
-  dividendDeclareDate?: null;
-  dividendFrequency?: null;
+  dividendYield?: number;
+  dividendAnnualPayout?: number;
+  dividendPayoutRatio?: number;
+  dividend5YearGrowhthRate?: number;
+  dividendYearsGrowhth?: number;
+  dividendAmount?: number;
+  dividendExDate?: string;
+  dividendPayoutDate?: string;
+  dividendRecordDate?: string;
+  dividendDeclareDate?: string;
+  dividendFrequency?: string;
   nextExDate?: null;
   nextPayDate?: null;
   //sector
@@ -31,9 +32,107 @@ class TickerModel {
 
   handlers: TickerHandler[] = [];
 
-  constructor(ticker: Omit<Ticker, "id">) {
-    Object.assign(this, ticker);
-    this.updatedAt = new Date(ticker.updatedAt);
+  constructor(ticker?: Omit<Ticker, "id">) {
+    if (ticker) {
+      Object.assign(this, ticker);
+      this.updatedAt = new Date(ticker.updatedAt);
+    }
+
+    return this;
+  }
+
+  setPrice(value: number | string) {
+    const parsed = cleanNumber(`${value}`);
+    if (typeof parsed !== "number") return;
+
+    this.price = parsed;
+
+    return this;
+  }
+
+  setDividendYield(value: number | string) {
+    const parsed = cleanNumber(`${value}`);
+    if (typeof parsed !== "number") return;
+
+    this.dividendYield = parsed;
+
+    return this;
+  }
+
+  setDividendYearsGrowhth(value: number | string) {
+    const parsed = cleanNumber(`${value}`);
+    if (typeof parsed !== "number") return;
+
+    this.dividendYearsGrowhth = parsed;
+
+    return this;
+  }
+
+  setDividend5YearGrowhthRate(value: number | string) {
+    const parsed = cleanNumber(`${value}`);
+    if (typeof parsed !== "number") return;
+
+    this.dividend5YearGrowhthRate = parsed;
+
+    return this;
+  }
+
+  setDividendAnnualPayout(value: number | string) {
+    const parsed = cleanNumber(`${value}`);
+    if (typeof parsed !== "number") return;
+
+    this.dividendAnnualPayout = parsed;
+
+    return this;
+  }
+
+  setDividendPayoutRatio(value: number | string) {
+    const parsed = cleanNumber(`${value}`);
+    if (typeof parsed !== "number") return;
+
+    this.dividendPayoutRatio = parsed;
+
+    return this;
+  }
+  setDividendAmount(value: number | string) {
+    const parsed = cleanNumber(`${value}`);
+    if (typeof parsed !== "number") return;
+
+    this.dividendAmount = parsed;
+
+    return this;
+  }
+
+  setDividendExDate(value: string) {
+    const parsed = formatDate(value);
+    if (!parsed) return;
+
+    this.dividendExDate = parsed;
+
+    return this;
+  }
+
+  setDividendPayoutDate(value: string) {
+    const parsed = formatDate(value);
+    if (!parsed) return;
+
+    this.dividendPayoutDate = parsed;
+
+    return this;
+  }
+  setDividendRecordDate(value: string) {
+    const parsed = formatDate(value);
+    if (!parsed) return;
+
+    this.dividendRecordDate = parsed;
+
+    return this;
+  }
+  setDividendDeclareDate(value: string) {
+    const parsed = formatDate(value);
+    if (!parsed) return;
+
+    this.dividendDeclareDate = parsed;
 
     return this;
   }
@@ -161,7 +260,7 @@ class TickerModel {
     }
   }
 
-  getHandlersWithDefault(): ScraperHandler[] {
+  getHandlersWithDefault(): ScraperHandler<HandlersData>[] {
     console.log({ scraperHandlers });
     return Object.values(scraperHandlers).filter((h) => h.defaultHandler);
   }

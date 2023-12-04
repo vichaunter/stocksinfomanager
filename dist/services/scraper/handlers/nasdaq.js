@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const dayjs_1 = __importDefault(require("dayjs"));
 const scraperError_1 = __importDefault(require("../../../errors/scraperError"));
+const tickerModel_1 = __importDefault(require("../../../models/tickerModel"));
 const utils_1 = require("../../../utils");
 const database_1 = __importDefault(require("../../database"));
 const name = "nasdaq";
@@ -30,6 +31,7 @@ const fetchData = async ({ url, item, }) => {
         await (0, utils_1.sleep)(1000);
     }
     database_1.default.saveRaw(name, item.symbol, data);
+    // console.log({ data });
     const converted = {
         price: (0, utils_1.cleanNumber)(data.main?.primaryData?.lastSalePrice),
         exDividendDate: (0, utils_1.formatDate)(data.dividends?.exDividendDate),
@@ -37,6 +39,31 @@ const fetchData = async ({ url, item, }) => {
         dividendYield: (0, utils_1.cleanNumber)(data.dividends?.yield),
     };
     return converted;
+};
+const rawToTicker = (symbol, raw) => {
+    let model = new tickerModel_1.default();
+    model.symbol = symbol;
+    const price = raw.main?.primaryData.lastSalePrice;
+    if (price) {
+        model.setPrice(price);
+    }
+    const dividendYield = raw.dividends?.yield;
+    if (dividendYield)
+        model.setDividendYield(dividendYield);
+    const dividendAnnualPayout = raw.dividends?.annualizedDividend;
+    if (dividendAnnualPayout)
+        model.setDividendAnnualPayout(dividendAnnualPayout);
+    const dividendPayoutRatio = raw.dividends?.payoutRatio;
+    if (dividendPayoutRatio)
+        model.setDividendPayoutRatio(dividendPayoutRatio);
+    const dividendDates = raw.dividends?.dividends.rows[0];
+    if (dividendDates) {
+        model.setDividendExDate(dividendDates.exOrEffDate);
+        model.setDividendPayoutDate(dividendDates.paymentDate);
+        model.setDividendRecordDate(dividendDates.recordDate);
+        model.setDividendDeclareDate(dividendDates.declarationDate);
+    }
+    return model;
 };
 const tickerUrl = (ticker) => `${apiUrl}/company/${ticker}/financials?frequency=1`;
 const defaultHandler = async (symbol) => {
@@ -55,5 +82,6 @@ const scraperHandler = {
     tickerUrl,
     fetch: fetchData,
     defaultHandler,
+    rawToTicker,
 };
 exports.default = scraperHandler;

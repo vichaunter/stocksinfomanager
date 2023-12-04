@@ -1,6 +1,7 @@
+import _ from "lodash";
 import pc from "picocolors";
 import TickerModel from "../models/tickerModel";
-import { ScraperHandler } from "../types";
+import { HandlersData, ScraperHandler } from "../types";
 import { browser } from "./browser";
 import database from "./database";
 import * as scraperHandlers from "./scraper/handlers";
@@ -14,7 +15,7 @@ const queue: QueueItem[] = [];
 type GetTickerDataProps = {
   item: TickerModel;
   url: string;
-  parser: ScraperHandler;
+  parser: ScraperHandler<HandlersData>;
 };
 const getTickerData = async ({ item, url, parser }: GetTickerDataProps) => {
   try {
@@ -37,59 +38,87 @@ const getTickerData = async ({ item, url, parser }: GetTickerDataProps) => {
   }
 };
 
+const updateFromRawData = async (symbol: string, handlers) => {
+  const raw = await database.getRawTicker(symbol);
+  if (!raw) return;
+
+  //here is all the ticker data from every handler
+  const allHandlersData: Record<string, TickerModel> = {};
+
+  handlers.forEach((handler) => {
+    const parser = scraperHandlers?.[
+      handler.id
+    ] as GetTickerDataProps["parser"];
+    const rawToTicker = parser?.rawToTicker;
+    if (rawToTicker) {
+      allHandlersData[handler.id] = rawToTicker(symbol, raw?.[handler.id]);
+    }
+  });
+
+  return new TickerModel(_.merge({}, ...Object.values(allHandlersData)));
+};
+
 const updateTicker = async (item: QueueItem) => {
   try {
     process.env.DEBUG && console.log("updateTicker_handlers:", item.handlers);
 
-    const promises = [...(item.handlers || []), ...item.getDefaultHandlers()]
-      .filter((h) => h.enabled) //remove disabled handlers
-      .map((handler) => {
-        return new Promise<{
-          key: string;
-          data: Record<string, string | string[]>;
-        }>(async (resolve, reject) => {
-          const parser = scraperHandlers?.[handler.id];
-          if (!parser || !handler.url)
-            return reject(
-              new Error(
-                `Missing parser or handler [${handler.id}] url for ${item.symbol}`
-              )
-            );
+    const handlers = [
+      ...(item.handlers || []),
+      ...item.getDefaultHandlers(),
+    ].filter((h) => h.enabled); //remove disabled handlers
 
-          try {
-            const data = await getTickerData({
-              item,
-              url: handler.url,
-              parser,
-            });
+    const promises = handlers.map((handler) => {
+      return new Promise<{
+        key: string;
+        data: Record<string, string | string[]>;
+      }>(async (resolve, reject) => {
+        const parser = scraperHandlers?.[handler.id];
+        if (!parser || !handler.url)
+          return reject(
+            new Error(
+              `Missing parser or handler [${handler.id}] url for ${item.symbol}`
+            )
+          );
 
-            if (data) {
-              return resolve({ key: parser.name, data });
-            }
+        try {
+          const data = await getTickerData({
+            item,
+            url: handler.url,
+            parser,
+          });
 
-            throw Error("Data not found");
-          } catch (error) {
-            await database.saveTickerError(item, {
-              name: error.name,
-              message: error.message,
-            });
-            return reject(error);
+          if (data) {
+            return resolve({ key: parser.name, data });
           }
-        });
+
+          throw Error("Data not found");
+        } catch (error) {
+          await database.saveTickerError(item, {
+            name: error.name,
+            message: error.message,
+          });
+          return reject(error);
+        }
       });
+    });
 
     const response = await Promise.all(promises.flat());
     if (process.env.DEV) return response;
 
-    response.forEach((parsed) => {
-      parsed.data && item.setData(parsed.data as any);
-    });
+    // handlers has obligation to store raw data,
+    // so lets update from that raw data the item
+    const convertedTicker = await updateFromRawData(item.symbol, handlers);
 
-    const saved = await item.saveTicker();
+    // return;
+    // response.forEach((parsed) => {
+    //   parsed.data && item.setData(parsed.data as any);
+    // });
+
+    const saved = await convertedTicker.saveTicker();
     if (saved) {
-      console.log(pc.green(`${item.symbol} saved`));
+      console.log(pc.green(`${convertedTicker.symbol} saved`));
     } else {
-      console.log(pc.red(`${item.symbol} error saving`));
+      console.log(pc.red(`${convertedTicker.symbol} error saving`));
     }
     console.log(`☰☰☰`);
   } catch (error) {

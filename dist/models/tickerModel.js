@@ -29,11 +29,91 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const picocolors_1 = __importDefault(require("picocolors"));
 const database_1 = __importDefault(require("../services/database"));
 const scraperHandlers = __importStar(require("../services/scraper/handlers"));
+const utils_1 = require("../utils");
 class TickerModel {
     constructor(ticker) {
         this.handlers = [];
-        Object.assign(this, ticker);
-        this.updatedAt = new Date(ticker.updatedAt);
+        if (ticker) {
+            Object.assign(this, ticker);
+            this.updatedAt = new Date(ticker.updatedAt);
+        }
+        return this;
+    }
+    setPrice(value) {
+        const parsed = (0, utils_1.cleanNumber)(`${value}`);
+        if (typeof parsed !== "number")
+            return;
+        this.price = parsed;
+        return this;
+    }
+    setDividendYield(value) {
+        const parsed = (0, utils_1.cleanNumber)(`${value}`);
+        if (typeof parsed !== "number")
+            return;
+        this.dividendYield = parsed;
+        return this;
+    }
+    setDividendYearsGrowhth(value) {
+        const parsed = (0, utils_1.cleanNumber)(`${value}`);
+        if (typeof parsed !== "number")
+            return;
+        this.dividendYearsGrowhth = parsed;
+        return this;
+    }
+    setDividend5YearGrowhthRate(value) {
+        const parsed = (0, utils_1.cleanNumber)(`${value}`);
+        if (typeof parsed !== "number")
+            return;
+        this.dividend5YearGrowhthRate = parsed;
+        return this;
+    }
+    setDividendAnnualPayout(value) {
+        const parsed = (0, utils_1.cleanNumber)(`${value}`);
+        if (typeof parsed !== "number")
+            return;
+        this.dividendAnnualPayout = parsed;
+        return this;
+    }
+    setDividendPayoutRatio(value) {
+        const parsed = (0, utils_1.cleanNumber)(`${value}`);
+        if (typeof parsed !== "number")
+            return;
+        this.dividendPayoutRatio = parsed;
+        return this;
+    }
+    setDividendAmount(value) {
+        const parsed = (0, utils_1.cleanNumber)(`${value}`);
+        if (typeof parsed !== "number")
+            return;
+        this.dividendAmount = parsed;
+        return this;
+    }
+    setDividendExDate(value) {
+        const parsed = (0, utils_1.formatDate)(value);
+        if (!parsed)
+            return;
+        this.dividendExDate = parsed;
+        return this;
+    }
+    setDividendPayoutDate(value) {
+        const parsed = (0, utils_1.formatDate)(value);
+        if (!parsed)
+            return;
+        this.dividendPayoutDate = parsed;
+        return this;
+    }
+    setDividendRecordDate(value) {
+        const parsed = (0, utils_1.formatDate)(value);
+        if (!parsed)
+            return;
+        this.dividendRecordDate = parsed;
+        return this;
+    }
+    setDividendDeclareDate(value) {
+        const parsed = (0, utils_1.formatDate)(value);
+        if (!parsed)
+            return;
+        this.dividendDeclareDate = parsed;
         return this;
     }
     invalidate() {

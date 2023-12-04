@@ -17,7 +17,7 @@ import { Prisma } from "@prisma/client";
 import dayjs from "dayjs";
 import { formatDate, sortObjByKeys } from "../../utils";
 
-function compressAndWriteFile(filePath, data) {
+async function compressAndWriteFile(filePath, data) {
   const jsonData = JSON.stringify(data, null, 2);
   const compressedData = zlibSync(strToU8(jsonData), { level: 9 });
   fs.writeFileSync(filePath, compressedData);
@@ -26,7 +26,7 @@ function compressAndWriteFile(filePath, data) {
 }
 
 // Function to read a compressed file and decompress data
-function readAndDecompressFile(filePath) {
+async function readAndDecompressFile(filePath) {
   const compressedData = fs.readFileSync(filePath);
   const decompressedData = decompressSync(compressedData);
   const decoded = new TextDecoder().decode(decompressedData);
@@ -172,7 +172,7 @@ class FilesystemDatabaseHandler extends DatabaseHandler {
   async saveRaw(handler: string, symbol: string, data: any): Promise<void> {
     let current: any = {};
     try {
-      current = readAndDecompressFile(PATHS.rawFile(symbol));
+      current = await readAndDecompressFile(PATHS.rawFile(symbol));
       // const currentRaw =
       // fs.readFileSync(PATHS.rawFile(symbol), {
       //   encoding: "utf-8",

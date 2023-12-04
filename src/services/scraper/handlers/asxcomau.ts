@@ -61,7 +61,7 @@ const parse = (source: string): Record<string, string> => {
   return mapped;
 };
 
-const scraper: ScraperHandler = {
+const scraper: ScraperHandler<any> = {
   name,
   baseUrl,
   tickerUrl,

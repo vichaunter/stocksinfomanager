@@ -26,6 +26,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const lodash_1 = __importDefault(require("lodash"));
 const picocolors_1 = __importDefault(require("picocolors"));
 const tickerModel_1 = __importDefault(require("../models/tickerModel"));
 const browser_1 = require("./browser");
@@ -52,12 +53,29 @@ const getTickerData = async ({ item, url, parser }) => {
         console.log(e);
     }
 };
+const updateFromRawData = async (symbol, handlers) => {
+    const raw = await database_1.default.getRawTicker(symbol);
+    if (!raw)
+        return;
+    //here is all the ticker data from every handler
+    const allHandlersData = {};
+    handlers.forEach((handler) => {
+        const parser = scraperHandlers?.[handler.id];
+        const rawToTicker = parser?.rawToTicker;
+        if (rawToTicker) {
+            allHandlersData[handler.id] = rawToTicker(symbol, raw?.[handler.id]);
+        }
+    });
+    return new tickerModel_1.default(lodash_1.default.merge({}, ...Object.values(allHandlersData)));
+};
 const updateTicker = async (item) => {
     try {
         process.env.DEBUG && console.log("updateTicker_handlers:", item.handlers);
-        const promises = [...(item.handlers || []), ...item.getDefaultHandlers()]
-            .filter((h) => h.enabled) //remove disabled handlers
-            .map((handler) => {
+        const handlers = [
+            ...(item.handlers || []),
+            ...item.getDefaultHandlers(),
+        ].filter((h) => h.enabled); //remove disabled handlers
+        const promises = handlers.map((handler) => {
             return new Promise(async (resolve, reject) => {
                 const parser = scraperHandlers?.[handler.id];
                 if (!parser || !handler.url)
@@ -85,15 +103,19 @@ const updateTicker = async (item) => {
         const response = await Promise.all(promises.flat());
         if (process.env.DEV)
             return response;
-        response.forEach((parsed) => {
-            parsed.data && item.setData(parsed.data);
-        });
-        const saved = await item.saveTicker();
+        // handlers has obligation to store raw data,
+        // so lets update from that raw data the item
+        const convertedTicker = await updateFromRawData(item.symbol, handlers);
+        // return;
+        // response.forEach((parsed) => {
+        //   parsed.data && item.setData(parsed.data as any);
+        // });
+        const saved = await convertedTicker.saveTicker();
         if (saved) {
-            console.log(picocolors_1.default.green(`${item.symbol} saved`));
+            console.log(picocolors_1.default.green(`${convertedTicker.symbol} saved`));
         }
         else {
-            console.log(picocolors_1.default.red(`${item.symbol} error saving`));
+            console.log(picocolors_1.default.red(`${convertedTicker.symbol} error saving`));
         }
         console.log(`☰☰☰`);
     }

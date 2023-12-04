@@ -35,7 +35,7 @@ const parse = (source: string): Record<string, string> => {
 
 const tickerUrl = (ticker: string) => `${baseUrl}/quote.ashx?t=${ticker}`;
 
-const scraperHandler: ScraperHandler = {
+const scraperHandler: ScraperHandler<any> = {
   name,
   baseUrl,
   tickerUrl,

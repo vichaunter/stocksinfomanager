@@ -4,6 +4,7 @@ import TickerModel from "../../../models/tickerModel";
 import { ScraperHandler } from "../../../types";
 import { cleanNumber, formatDate, sleep } from "../../../utils";
 import database from "../../database";
+import { NasdaqRawData } from "./types/nasdaqTypes";
 
 const name = "nasdaq";
 const baseUrl = `https://www.nasdaq.com`;
@@ -40,7 +41,7 @@ const fetchData = async ({
   }
 
   database.saveRaw(name, item.symbol, data);
-
+  // console.log({ data });
   const converted = {
     price: cleanNumber(data.main?.primaryData?.lastSalePrice),
     exDividendDate: formatDate(data.dividends?.exDividendDate),
@@ -49,6 +50,39 @@ const fetchData = async ({
   };
 
   return converted;
+};
+
+const rawToTicker = <T extends NasdaqRawData>(
+  symbol: string,
+  raw: T
+): TickerModel => {
+  let model = new TickerModel();
+
+  model.symbol = symbol;
+
+  const price = raw.main?.primaryData.lastSalePrice;
+  if (price) {
+    model.setPrice(price);
+  }
+
+  const dividendYield = raw.dividends?.yield;
+  if (dividendYield) model.setDividendYield(dividendYield);
+
+  const dividendAnnualPayout = raw.dividends?.annualizedDividend;
+  if (dividendAnnualPayout) model.setDividendAnnualPayout(dividendAnnualPayout);
+
+  const dividendPayoutRatio = raw.dividends?.payoutRatio;
+  if (dividendPayoutRatio) model.setDividendPayoutRatio(dividendPayoutRatio);
+
+  const dividendDates = raw.dividends?.dividends.rows[0];
+  if (dividendDates) {
+    model.setDividendExDate(dividendDates.exOrEffDate);
+    model.setDividendPayoutDate(dividendDates.paymentDate);
+    model.setDividendRecordDate(dividendDates.recordDate);
+    model.setDividendDeclareDate(dividendDates.declarationDate);
+  }
+
+  return model;
 };
 
 const tickerUrl = (ticker: string) =>
@@ -68,12 +102,13 @@ const defaultHandler = async (symbol: string): Promise<string | void> => {
   }
 };
 
-const scraperHandler: ScraperHandler = {
+const scraperHandler: ScraperHandler<NasdaqRawData> = {
   name,
   baseUrl,
   tickerUrl,
   fetch: fetchData,
   defaultHandler,
+  rawToTicker,
 };
 
 export default scraperHandler;

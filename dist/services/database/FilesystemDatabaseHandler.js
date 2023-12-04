@@ -12,7 +12,7 @@ const tickerModel_1 = __importDefault(require("../../models/tickerModel"));
 const DatabaseHandler_1 = __importDefault(require("./DatabaseHandler"));
 const dayjs_1 = __importDefault(require("dayjs"));
 const utils_1 = require("../../utils");
-function compressAndWriteFile(filePath, data) {
+async function compressAndWriteFile(filePath, data) {
     const jsonData = JSON.stringify(data, null, 2);
     const compressedData = (0, fflate_1.zlibSync)((0, fflate_1.strToU8)(jsonData), { level: 9 });
     node_fs_1.default.writeFileSync(filePath, compressedData);
@@ -20,7 +20,7 @@ function compressAndWriteFile(filePath, data) {
     return true;
 }
 // Function to read a compressed file and decompress data
-function readAndDecompressFile(filePath) {
+async function readAndDecompressFile(filePath) {
     const compressedData = node_fs_1.default.readFileSync(filePath);
     const decompressedData = (0, fflate_1.decompressSync)(compressedData);
     const decoded = new TextDecoder().decode(decompressedData);
@@ -126,7 +126,7 @@ class FilesystemDatabaseHandler extends DatabaseHandler_1.default {
     async saveRaw(handler, symbol, data) {
         let current = {};
         try {
-            current = readAndDecompressFile(constants_1.PATHS.rawFile(symbol));
+            current = await readAndDecompressFile(constants_1.PATHS.rawFile(symbol));
             // const currentRaw =
             // fs.readFileSync(PATHS.rawFile(symbol), {
             //   encoding: "utf-8",

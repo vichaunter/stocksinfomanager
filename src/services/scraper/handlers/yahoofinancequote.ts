@@ -65,7 +65,7 @@ const defaultHandler = async (symbol: string): Promise<string | void> => {
   return;
 };
 
-const scraperHandler: ScraperHandler = {
+const scraperHandler: ScraperHandler<any> = {
   name,
   baseUrl,
   tickerUrl,
