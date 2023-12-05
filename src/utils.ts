@@ -1,9 +1,10 @@
 import dayjs, { Dayjs } from "dayjs";
 import getSystemLocale from "system-locale";
 import pc from "picocolors";
+import dev from "./dev";
 
 getSystemLocale().then((locale) => {
-  console.log(pc.bgYellow(`Locale system loaded: ${locale}`));
+  dev.log(pc.bgYellow(`Locale system loaded: ${locale}`));
   dayjs.locale(locale);
 });
 
@@ -25,8 +26,7 @@ export const camelizeText = (str: string) => {
   );
 };
 
-export const cleanNumber = (str: string) => {
-  if (!str) return str;
+export const cleanNumber = (str: string): number => {
   return parseFloat(str.replace(/[^0-9\.\%\- ]/g, ""));
 };
 
@@ -61,4 +61,34 @@ export const sortObjByKeys = (obj: Record<string, any>) => {
     });
 
   return sorted;
+};
+
+export const findMode = (arr: number[]): number => {
+  if (arr.length === 0) return;
+
+  const counter: Record<string, number> = {};
+  arr.forEach((n) => {
+    counter[n] = (counter[n] ?? 0) + 1;
+  });
+
+  const sorted = Object.entries(counter)
+    .map(([k, v]) => ({ value: k, frequency: v }))
+    .sort((a, b) => b.frequency - a.frequency);
+
+  return Number(sorted?.[0]?.value) ?? 0;
+};
+
+export const getDividendFrequency = (dates: Date[]): number => {
+  const countPerYear = {};
+
+  for (const date of dates) {
+    const year = date.getFullYear();
+    countPerYear[year] = (countPerYear[year] ?? 0) + 1;
+  }
+
+  let frequency = 0; //0 means no dividends
+
+  frequency = Math.floor(findMode(Object.values(countPerYear)));
+
+  return frequency;
 };

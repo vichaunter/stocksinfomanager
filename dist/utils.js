@@ -3,12 +3,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sortObjByKeys = exports.getDividendPercentage = exports.sleep = exports.formatDate = exports.parseDate = exports.cleanNumber = exports.camelizeText = exports.ucFirstAll = exports.lcFirst = exports.ucFirst = void 0;
+exports.getDividendFrequency = exports.findMode = exports.sortObjByKeys = exports.getDividendPercentage = exports.sleep = exports.formatDate = exports.parseDate = exports.cleanNumber = exports.camelizeText = exports.ucFirstAll = exports.lcFirst = exports.ucFirst = void 0;
 const dayjs_1 = __importDefault(require("dayjs"));
 const system_locale_1 = __importDefault(require("system-locale"));
 const picocolors_1 = __importDefault(require("picocolors"));
+const dev_1 = __importDefault(require("./dev"));
 (0, system_locale_1.default)().then((locale) => {
-    console.log(picocolors_1.default.bgYellow(`Locale system loaded: ${locale}`));
+    dev_1.default.log(picocolors_1.default.bgYellow(`Locale system loaded: ${locale}`));
     dayjs_1.default.locale(locale);
 });
 const ucFirst = (str) => str.slice(0, 1).toUpperCase() + str.slice(1);
@@ -25,8 +26,6 @@ const camelizeText = (str) => {
 };
 exports.camelizeText = camelizeText;
 const cleanNumber = (str) => {
-    if (!str)
-        return str;
     return parseFloat(str.replace(/[^0-9\.\%\- ]/g, ""));
 };
 exports.cleanNumber = cleanNumber;
@@ -60,3 +59,27 @@ const sortObjByKeys = (obj) => {
     return sorted;
 };
 exports.sortObjByKeys = sortObjByKeys;
+const findMode = (arr) => {
+    if (arr.length === 0)
+        return;
+    const counter = {};
+    arr.forEach((n) => {
+        counter[n] = (counter[n] ?? 0) + 1;
+    });
+    const sorted = Object.entries(counter)
+        .map(([k, v]) => ({ value: k, frequency: v }))
+        .sort((a, b) => b.frequency - a.frequency);
+    return Number(sorted?.[0]?.value) ?? 0;
+};
+exports.findMode = findMode;
+const getDividendFrequency = (dates) => {
+    const countPerYear = {};
+    for (const date of dates) {
+        const year = date.getFullYear();
+        countPerYear[year] = (countPerYear[year] ?? 0) + 1;
+    }
+    let frequency = 0; //0 means no dividends
+    frequency = Math.floor((0, exports.findMode)(Object.values(countPerYear)));
+    return frequency;
+};
+exports.getDividendFrequency = getDividendFrequency;

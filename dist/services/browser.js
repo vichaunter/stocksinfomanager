@@ -4,9 +4,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.browser = void 0;
-const puppeteer_1 = __importDefault(require("puppeteer"));
 const system_locale_1 = __importDefault(require("system-locale"));
 const picocolors_1 = __importDefault(require("picocolors"));
+const puppeteer_extra_1 = __importDefault(require("puppeteer-extra"));
+const puppeteer_extra_plugin_stealth_1 = __importDefault(require("puppeteer-extra-plugin-stealth"));
 const USER_AGENTS = [
     // Chrome user agents
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/94.0.4606.61 Safari/537.36",
@@ -71,10 +72,15 @@ class Browser {
     async init() {
         if (!this.instance) {
             const locale = await (0, system_locale_1.default)();
-            this.instance = await puppeteer_1.default.launch({
+            puppeteer_extra_1.default.use((0, puppeteer_extra_plugin_stealth_1.default)());
+            this.instance = await puppeteer_extra_1.default.launch({
                 headless: "new",
                 args: ["--no-sandbox", `--lang=${locale}`],
             });
+            // this.instance = await puppeteer.launch({
+            //   headless: "new",
+            //   args: ["--no-sandbox", `--lang=${locale}`],
+            // });
         }
     }
     async getPage() {

@@ -46,13 +46,18 @@ const resolvers = {
         async rawTicker(_, { symbol }) {
             return await database_1.default.getRawTicker(symbol);
         },
+        async nextTickerToUpdate(_) {
+            const nextTicker = await database_1.default.getNextTickerToUpdate();
+            if (nextTicker) {
+                await updater_1.default.updateTicker(nextTicker);
+            }
+            return await database_1.default.getTicker(nextTicker.symbol);
+        },
     },
     Mutation: {
         async createTicker(_, { symbol }) {
-            console.log("Mutator ticker:", symbol);
             try {
                 const ticker = new tickerModel_1.default({ symbol });
-                console.log("save ticker");
                 await ticker.saveTicker();
                 return ticker;
             }

@@ -49,13 +49,19 @@ const resolvers = {
     async rawTicker(_, { symbol }) {
       return await database.getRawTicker(symbol);
     },
+    async nextTickerToUpdate(_) {
+      const nextTicker = await database.getNextTickerToUpdate();
+      if (nextTicker) {
+        await updater.updateTicker(nextTicker);
+      }
+
+      return await database.getTicker(nextTicker.symbol);
+    },
   },
   Mutation: {
     async createTicker(_, { symbol }) {
-      console.log("Mutator ticker:", symbol);
       try {
         const ticker = new TickerModel({ symbol } as any);
-        console.log("save ticker");
         await ticker.saveTicker();
 
         return ticker;

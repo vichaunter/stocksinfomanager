@@ -2,7 +2,7 @@ import dayjs from "dayjs";
 import ScraperError from "../../../errors/scraperError";
 import TickerModel from "../../../models/tickerModel";
 import { ScraperHandler } from "../../../types";
-import { cleanNumber, formatDate, sleep } from "../../../utils";
+import { formatDate, getDividendFrequency, sleep } from "../../../utils";
 import database from "../../database";
 import { NasdaqRawData } from "./types/nasdaqTypes";
 
@@ -41,15 +41,8 @@ const fetchData = async ({
   }
 
   database.saveRaw(name, item.symbol, data);
-  // console.log({ data });
-  const converted = {
-    price: cleanNumber(data.main?.primaryData?.lastSalePrice),
-    exDividendDate: formatDate(data.dividends?.exDividendDate),
-    annualizedDividend: cleanNumber(data.dividends?.annualizedDividend),
-    dividendYield: cleanNumber(data.dividends?.yield),
-  };
 
-  return converted;
+  return data;
 };
 
 const rawToTicker = <T extends NasdaqRawData>(
@@ -74,12 +67,23 @@ const rawToTicker = <T extends NasdaqRawData>(
   const dividendPayoutRatio = raw.dividends?.payoutRatio;
   if (dividendPayoutRatio) model.setDividendPayoutRatio(dividendPayoutRatio);
 
-  const dividendDates = raw.dividends?.dividends.rows[0];
+  const dividendDates = raw.dividends?.dividends.rows?.[0];
   if (dividendDates) {
     model.setDividendExDate(dividendDates.exOrEffDate);
     model.setDividendPayoutDate(dividendDates.paymentDate);
     model.setDividendRecordDate(dividendDates.recordDate);
     model.setDividendDeclareDate(dividendDates.declarationDate);
+    //TODO: determine when the stock pay dividends
+  } else {
+    model.setPayDividend(false);
+  }
+
+  const exDates = raw?.dividends?.dividends?.rows?.map(
+    (dividend) => new Date(formatDate(dividend.exOrEffDate))
+  );
+  if (exDates?.length) {
+    const frequency = getDividendFrequency(exDates);
+    model.setDividendFrequency(frequency);
   }
 
   return model;

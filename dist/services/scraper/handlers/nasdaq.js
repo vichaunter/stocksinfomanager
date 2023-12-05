@@ -31,14 +31,7 @@ const fetchData = async ({ url, item, }) => {
         await (0, utils_1.sleep)(1000);
     }
     database_1.default.saveRaw(name, item.symbol, data);
-    // console.log({ data });
-    const converted = {
-        price: (0, utils_1.cleanNumber)(data.main?.primaryData?.lastSalePrice),
-        exDividendDate: (0, utils_1.formatDate)(data.dividends?.exDividendDate),
-        annualizedDividend: (0, utils_1.cleanNumber)(data.dividends?.annualizedDividend),
-        dividendYield: (0, utils_1.cleanNumber)(data.dividends?.yield),
-    };
-    return converted;
+    return data;
 };
 const rawToTicker = (symbol, raw) => {
     let model = new tickerModel_1.default();
@@ -56,12 +49,21 @@ const rawToTicker = (symbol, raw) => {
     const dividendPayoutRatio = raw.dividends?.payoutRatio;
     if (dividendPayoutRatio)
         model.setDividendPayoutRatio(dividendPayoutRatio);
-    const dividendDates = raw.dividends?.dividends.rows[0];
+    const dividendDates = raw.dividends?.dividends.rows?.[0];
     if (dividendDates) {
         model.setDividendExDate(dividendDates.exOrEffDate);
         model.setDividendPayoutDate(dividendDates.paymentDate);
         model.setDividendRecordDate(dividendDates.recordDate);
         model.setDividendDeclareDate(dividendDates.declarationDate);
+        //TODO: determine when the stock pay dividends
+    }
+    else {
+        model.setPayDividend(false);
+    }
+    const exDates = raw?.dividends?.dividends?.rows?.map((dividend) => new Date((0, utils_1.formatDate)(dividend.exOrEffDate)));
+    if (exDates?.length) {
+        const frequency = (0, utils_1.getDividendFrequency)(exDates);
+        model.setDividendFrequency(frequency);
     }
     return model;
 };

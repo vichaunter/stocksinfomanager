@@ -1,27 +1,26 @@
-import {
-  Gzip,
-  decompressSync,
-  gzipSync,
-  inflateSync,
-  zlibSync,
-  strToU8,
-  compressSync,
-} from "fflate";
-import pc from "picocolors";
-import fs from "node:fs";
-import path from "node:path";
-import { PATHS } from "../../constants";
-import TickerModel from "../../models/tickerModel";
-import DatabaseHandler from "./DatabaseHandler";
 import { Prisma } from "@prisma/client";
 import dayjs from "dayjs";
+import { decompressSync, strToU8, zlibSync } from "fflate";
+import fs from "node:fs";
+import path from "node:path";
+import pc from "picocolors";
+import { PATHS } from "../../constants";
+import dev from "../../dev";
+import TickerModel from "../../models/tickerModel";
 import { formatDate, sortObjByKeys } from "../../utils";
+import DatabaseHandler from "./DatabaseHandler";
 
 async function compressAndWriteFile(filePath, data) {
   const jsonData = JSON.stringify(data, null, 2);
   const compressedData = zlibSync(strToU8(jsonData), { level: 9 });
+
   fs.writeFileSync(filePath, compressedData);
-  console.log("File compressed and written successfully.");
+
+  dev.log(
+    "FSDBH compressAndWriteFile",
+    "File compressed and written successfully."
+  );
+
   return true;
 }
 
@@ -31,7 +30,7 @@ async function readAndDecompressFile(filePath) {
   const decompressedData = decompressSync(compressedData);
   const decoded = new TextDecoder().decode(decompressedData);
   const jsonData = JSON.parse(decoded);
-  console.log("File read and decompressed successfully.");
+  dev.log("File read and decompressed successfully.");
   return jsonData;
 }
 
@@ -51,6 +50,8 @@ const updateOrCreate = async (path: string, data: any) => {
     ...data,
   });
 
+  dev.log("FilesystemDatabaseHandler updateOrCreate:", { newData });
+
   fs.writeFileSync(path, JSON.stringify(data, null, 2));
 
   return newData;
@@ -58,7 +59,7 @@ const updateOrCreate = async (path: string, data: any) => {
 
 class FilesystemDatabaseHandler extends DatabaseHandler {
   async init() {
-    console.log("Init FilesystemDb");
+    console.log(pc.blue("Init FilesystemDb"));
     if (!fs.existsSync(PATHS.tickers)) {
       return !!fs.mkdirSync(PATHS.tickers, { recursive: true });
     }
@@ -116,10 +117,9 @@ class FilesystemDatabaseHandler extends DatabaseHandler {
 
   async getRawTicker(symbol: string): Promise<Record<string, any>> {
     const tickerFile = PATHS.rawFile(symbol);
-    console.log(tickerFile);
+    dev.log("FSDBH getRawTicker", tickerFile);
     if (!fs.existsSync(tickerFile)) return;
 
-    // const rawData = fs.readFileSync(tickerFile, "utf-8");
     const rawData = await readAndDecompressFile(tickerFile);
 
     return rawData;
@@ -135,7 +135,7 @@ class FilesystemDatabaseHandler extends DatabaseHandler {
       ticker && data.push(ticker);
     }
 
-    console.log(data);
+    dev.log("FSDBH getTickers:", data);
     //TODO: check this
     return data as TickerModel[];
   }
@@ -154,7 +154,7 @@ class FilesystemDatabaseHandler extends DatabaseHandler {
           pc.yellow(`Data was not provider to save [${ticker.symbol}]`)
         );
 
-      if (!ticker.updatedAt) ticker.updatedAt = new Date();
+      if (!ticker.updatedAt) ticker.updatedAt = formatDate(dayjs());
 
       const newData = sortObjByKeys({
         ...ticker,
@@ -173,17 +173,11 @@ class FilesystemDatabaseHandler extends DatabaseHandler {
     let current: any = {};
     try {
       current = await readAndDecompressFile(PATHS.rawFile(symbol));
-      // const currentRaw =
-      // fs.readFileSync(PATHS.rawFile(symbol), {
-      //   encoding: "utf-8",
-      // });
-      // current = JSON.parse(currentRaw);
     } catch (e) {
       await compressAndWriteFile(PATHS.rawFile(symbol), current);
-      // fs.writeFileSync(PATHS.rawFile(symbol), JSON.stringify(current));
     }
 
-    console.log("saveRaw current:", Object.keys(current));
+    dev.log("FSDBH saveRaw:", Object.keys(current));
 
     const newData = {
       ...(current ?? {}),
@@ -191,7 +185,6 @@ class FilesystemDatabaseHandler extends DatabaseHandler {
     };
 
     compressAndWriteFile(PATHS.rawFile(symbol), newData);
-    //fs.writeFileSync(PATHS.rawFile(symbol), JSON.stringify(newData, null, 2));
   }
 }
 

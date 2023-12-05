@@ -5,6 +5,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const picocolors_1 = __importDefault(require("picocolors"));
 const index_1 = require("./database/index");
+const dayjs_1 = __importDefault(require("dayjs"));
 class Database {
     constructor(handler) {
         this.handler = handler;
@@ -18,6 +19,13 @@ class Database {
     }
     async getRawTicker(symbol) {
         return this.handler.getRawTicker(symbol);
+    }
+    async getNextTickerToUpdate() {
+        const tickers = await this.getTickers();
+        const nextTicker = tickers
+            .filter((t) => !t.error)
+            .sort((a, b) => (0, dayjs_1.default)(a.updatedAt).unix() - (0, dayjs_1.default)(b.updatedAt).unix())?.[0];
+        return nextTicker;
     }
     async getTickers() {
         return this.handler.getTickers();

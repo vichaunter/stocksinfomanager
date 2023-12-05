@@ -1,6 +1,8 @@
 import puppeteer, { Browser as PPBrowser } from "puppeteer";
 import getSystemLocale from "system-locale";
 import pc from "picocolors";
+import pp from "puppeteer-extra";
+import StealthPlugin from "puppeteer-extra-plugin-stealth";
 
 const USER_AGENTS = [
   // Chrome user agents
@@ -74,10 +76,15 @@ class Browser {
   private async init() {
     if (!this.instance) {
       const locale = await getSystemLocale();
-      this.instance = await puppeteer.launch({
+      pp.use(StealthPlugin());
+      this.instance = await pp.launch({
         headless: "new",
         args: ["--no-sandbox", `--lang=${locale}`],
       });
+      // this.instance = await puppeteer.launch({
+      //   headless: "new",
+      //   args: ["--no-sandbox", `--lang=${locale}`],
+      // });
     }
   }
 

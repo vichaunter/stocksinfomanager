@@ -7,6 +7,8 @@ const typeDefs = `#graphql
         id:         String
         symbol:     String
         price:      Float
+        name:       String
+        payDividend: Boolean
         dividendYield: Float
         dividendAnnualPayout: Float
         dividendPayoutRatio: Float
@@ -24,22 +26,6 @@ const typeDefs = `#graphql
         updatedAt:  String
     }
 
-    type TickerData {
-        id:                       String
-        price:                    String
-        dividend:                 String
-        dividendYield:            String
-        dividendAnnualized:       Float
-        dividend5YearGrowhthRate: String
-        dividendYearsGrowhth:     String
-        dividendPayoutRatio:      String
-        dividendFrequency:        String
-        lastExDate:               String
-        lastPayoutDate:           String
-        nextPayDate:              String
-        nextExDate:               String
-    }
-
     type TickerRaw {
         finviz: JSON
         nasdaq: JSON
@@ -50,6 +36,7 @@ const typeDefs = `#graphql
         ticker(symbol: String!): Ticker!
         tickers: [Ticker]
         rawTicker(symbol: String!) : TickerRaw
+        nextTickerToUpdate: Ticker
     }
 
     input TickerInput {

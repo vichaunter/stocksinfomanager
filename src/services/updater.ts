@@ -41,7 +41,6 @@ const getTickerData = async ({ item, url, parser }: GetTickerDataProps) => {
 const updateFromRawData = async (symbol: string, handlers) => {
   const raw = await database.getRawTicker(symbol);
   if (!raw) return;
-
   //here is all the ticker data from every handler
   const allHandlersData: Record<string, TickerModel> = {};
 
@@ -108,11 +107,6 @@ const updateTicker = async (item: QueueItem) => {
     // handlers has obligation to store raw data,
     // so lets update from that raw data the item
     const convertedTicker = await updateFromRawData(item.symbol, handlers);
-
-    // return;
-    // response.forEach((parsed) => {
-    //   parsed.data && item.setData(parsed.data as any);
-    // });
 
     const saved = await convertedTicker.saveTicker();
     if (saved) {

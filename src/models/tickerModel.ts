@@ -4,13 +4,16 @@ import database from "../services/database";
 import { HandlersData, ScraperHandler, SortMode } from "../types";
 import * as scraperHandlers from "../services/scraper/handlers";
 import { cleanNumber, formatDate } from "../utils";
+import dayjs from "dayjs";
 
 class TickerModel {
   id?: string; // dbId
 
   symbol: string;
   price?: number;
+  name?: string;
 
+  payDividend?: boolean;
   dividendYield?: number;
   dividendAnnualPayout?: number;
   dividendPayoutRatio?: number;
@@ -21,21 +24,23 @@ class TickerModel {
   dividendPayoutDate?: string;
   dividendRecordDate?: string;
   dividendDeclareDate?: string;
-  dividendFrequency?: string;
+  dividendFrequency?: number;
   nextExDate?: null;
   nextPayDate?: null;
   //sector
   //industria
 
   error?: any;
-  updatedAt?: Date;
+  updatedAt?: string;
 
   handlers: TickerHandler[] = [];
 
   constructor(ticker?: Omit<Ticker, "id">) {
     if (ticker) {
       Object.assign(this, ticker);
-      this.updatedAt = new Date(ticker.updatedAt);
+      if (ticker.symbol && !this.id) {
+        this.id = ticker.symbol;
+      }
     }
 
     return this;
@@ -43,16 +48,24 @@ class TickerModel {
 
   setPrice(value: number | string) {
     const parsed = cleanNumber(`${value}`);
-    if (typeof parsed !== "number") return;
+    if (isNaN(parsed)) return;
 
     this.price = parsed;
 
     return this;
   }
 
+  setName(value: string) {
+    this.name = value;
+  }
+
+  setPayDividend(value: boolean) {
+    this.payDividend = value;
+  }
+
   setDividendYield(value: number | string) {
     const parsed = cleanNumber(`${value}`);
-    if (typeof parsed !== "number") return;
+    if (isNaN(parsed)) return;
 
     this.dividendYield = parsed;
 
@@ -61,7 +74,7 @@ class TickerModel {
 
   setDividendYearsGrowhth(value: number | string) {
     const parsed = cleanNumber(`${value}`);
-    if (typeof parsed !== "number") return;
+    if (isNaN(parsed)) return;
 
     this.dividendYearsGrowhth = parsed;
 
@@ -70,7 +83,7 @@ class TickerModel {
 
   setDividend5YearGrowhthRate(value: number | string) {
     const parsed = cleanNumber(`${value}`);
-    if (typeof parsed !== "number") return;
+    if (isNaN(parsed)) return;
 
     this.dividend5YearGrowhthRate = parsed;
 
@@ -79,7 +92,7 @@ class TickerModel {
 
   setDividendAnnualPayout(value: number | string) {
     const parsed = cleanNumber(`${value}`);
-    if (typeof parsed !== "number") return;
+    if (isNaN(parsed)) return;
 
     this.dividendAnnualPayout = parsed;
 
@@ -88,7 +101,7 @@ class TickerModel {
 
   setDividendPayoutRatio(value: number | string) {
     const parsed = cleanNumber(`${value}`);
-    if (typeof parsed !== "number") return;
+    if (isNaN(parsed)) return;
 
     this.dividendPayoutRatio = parsed;
 
@@ -96,7 +109,7 @@ class TickerModel {
   }
   setDividendAmount(value: number | string) {
     const parsed = cleanNumber(`${value}`);
-    if (typeof parsed !== "number") return;
+    if (isNaN(parsed)) return;
 
     this.dividendAmount = parsed;
 
@@ -137,6 +150,10 @@ class TickerModel {
     return this;
   }
 
+  setDividendFrequency(value: number) {
+    this.dividendFrequency = value;
+  }
+
   invalidate() {
     console.warn("invalidate not implemented...");
     // this.tickerData = undefined;
@@ -159,7 +176,7 @@ class TickerModel {
       tickerId: this.id,
       url: d.tickerUrl(this.symbol),
       enabled: true,
-      updatedAt: new Date(),
+      updatedAt: formatDate(dayjs()),
     }));
   }
 

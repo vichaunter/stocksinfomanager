@@ -3,6 +3,7 @@ import pc from "picocolors";
 import TickerModel from "../models/tickerModel";
 import DatabaseHandler from "./database/DatabaseHandler";
 import { handlers } from "./database/index";
+import dayjs from "dayjs";
 
 class Database {
   handler: DatabaseHandler;
@@ -24,6 +25,17 @@ class Database {
     symbol: TickerModel["symbol"]
   ): Promise<Record<string, any> | null> {
     return this.handler.getRawTicker(symbol);
+  }
+
+  async getNextTickerToUpdate() {
+    const tickers = await this.getTickers();
+    const nextTicker = tickers
+      .filter((t) => !t.error)
+      .sort(
+        (a, b) => dayjs(a.updatedAt).unix() - dayjs(b.updatedAt).unix()
+      )?.[0];
+
+    return nextTicker;
   }
 
   async getTickers(): Promise<TickerModel[] | null> {

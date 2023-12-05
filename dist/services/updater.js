@@ -106,10 +106,6 @@ const updateTicker = async (item) => {
         // handlers has obligation to store raw data,
         // so lets update from that raw data the item
         const convertedTicker = await updateFromRawData(item.symbol, handlers);
-        // return;
-        // response.forEach((parsed) => {
-        //   parsed.data && item.setData(parsed.data as any);
-        // });
         const saved = await convertedTicker.saveTicker();
         if (saved) {
             console.log(picocolors_1.default.green(`${convertedTicker.symbol} saved`));

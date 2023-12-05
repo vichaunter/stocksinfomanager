@@ -30,60 +30,69 @@ const picocolors_1 = __importDefault(require("picocolors"));
 const database_1 = __importDefault(require("../services/database"));
 const scraperHandlers = __importStar(require("../services/scraper/handlers"));
 const utils_1 = require("../utils");
+const dayjs_1 = __importDefault(require("dayjs"));
 class TickerModel {
     constructor(ticker) {
         this.handlers = [];
         if (ticker) {
             Object.assign(this, ticker);
-            this.updatedAt = new Date(ticker.updatedAt);
+            if (ticker.symbol && !this.id) {
+                this.id = ticker.symbol;
+            }
         }
         return this;
     }
     setPrice(value) {
         const parsed = (0, utils_1.cleanNumber)(`${value}`);
-        if (typeof parsed !== "number")
+        if (isNaN(parsed))
             return;
         this.price = parsed;
         return this;
     }
+    setName(value) {
+        this.name = value;
+    }
+    setPayDividend(value) {
+        this.payDividend = value;
+    }
     setDividendYield(value) {
         const parsed = (0, utils_1.cleanNumber)(`${value}`);
-        if (typeof parsed !== "number")
+        if (isNaN(parsed))
             return;
         this.dividendYield = parsed;
         return this;
     }
     setDividendYearsGrowhth(value) {
         const parsed = (0, utils_1.cleanNumber)(`${value}`);
-        if (typeof parsed !== "number")
+        if (isNaN(parsed))
             return;
         this.dividendYearsGrowhth = parsed;
         return this;
     }
     setDividend5YearGrowhthRate(value) {
         const parsed = (0, utils_1.cleanNumber)(`${value}`);
-        if (typeof parsed !== "number")
+        if (isNaN(parsed))
             return;
         this.dividend5YearGrowhthRate = parsed;
         return this;
     }
     setDividendAnnualPayout(value) {
         const parsed = (0, utils_1.cleanNumber)(`${value}`);
-        if (typeof parsed !== "number")
+        if (isNaN(parsed))
             return;
         this.dividendAnnualPayout = parsed;
         return this;
     }
     setDividendPayoutRatio(value) {
         const parsed = (0, utils_1.cleanNumber)(`${value}`);
-        if (typeof parsed !== "number")
+        if (isNaN(parsed))
             return;
         this.dividendPayoutRatio = parsed;
         return this;
     }
     setDividendAmount(value) {
         const parsed = (0, utils_1.cleanNumber)(`${value}`);
-        if (typeof parsed !== "number")
+        if (isNaN(parsed))
             return;
         this.dividendAmount = parsed;
         return this;
@@ -116,6 +125,9 @@ class TickerModel {
         this.dividendDeclareDate = parsed;
         return this;
     }
+    setDividendFrequency(value) {
+        this.dividendFrequency = value;
+    }
     invalidate() {
         console.warn("invalidate not implemented...");
         // this.tickerData = undefined;
@@ -136,7 +148,7 @@ class TickerModel {
             tickerId: this.id,
             url: d.tickerUrl(this.symbol),
             enabled: true,
-            updatedAt: new Date(),
+            updatedAt: (0, utils_1.formatDate)((0, dayjs_1.default)()),
         }));
     }
     async getData() {
