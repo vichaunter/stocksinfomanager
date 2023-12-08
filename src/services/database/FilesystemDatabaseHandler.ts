@@ -131,7 +131,15 @@ class FilesystemDatabaseHandler extends DatabaseHandler {
     const data = [];
 
     if (args.tickers) {
-      list = list.filter((ticker) => args.tickers.includes(ticker));
+      if (args.tickers.length === 1) {
+        list = list.filter((ticker) =>
+          ticker.startsWith(args.tickers[0].trim())
+        );
+      } else if (args.tickers.length > 1) {
+        list = list.filter((ticker) =>
+          (args.tickers as string[]).map((t) => t.trim()).includes(ticker)
+        );
+      }
     }
 
     for (let i = 0; i < list.length; i++) {

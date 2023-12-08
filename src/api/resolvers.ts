@@ -39,7 +39,7 @@ const apolloQueryToMongoProjection = (fieldNodes) => {
 };
 
 export type ApiTickersArgs = {
-  tickers?: string[];
+  tickers?: string[] | string;
   withDividend: boolean;
   withPrice: boolean;
   minDivYield: number;
