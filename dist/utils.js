@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getDividendFrequency = exports.findMode = exports.sortObjByKeys = exports.getDividendPercentage = exports.sleep = exports.formatDate = exports.parseDate = exports.cleanNumber = exports.camelizeText = exports.ucFirstAll = exports.lcFirst = exports.ucFirst = void 0;
+exports.getDividendFrequency = exports.getDividendYearPayments = exports.findMode = exports.sortObjByKeys = exports.getDividendPercentage = exports.sleep = exports.formatDate = exports.parseDate = exports.cleanNumber = exports.camelizeText = exports.ucFirstAll = exports.lcFirst = exports.ucFirst = void 0;
 const dayjs_1 = __importDefault(require("dayjs"));
 const system_locale_1 = __importDefault(require("system-locale"));
 const picocolors_1 = __importDefault(require("picocolors"));
@@ -61,7 +61,7 @@ const sortObjByKeys = (obj) => {
 exports.sortObjByKeys = sortObjByKeys;
 const findMode = (arr) => {
     if (arr.length === 0)
-        return;
+        return 0;
     const counter = {};
     arr.forEach((n) => {
         counter[n] = (counter[n] ?? 0) + 1;
@@ -69,15 +69,23 @@ const findMode = (arr) => {
     const sorted = Object.entries(counter)
         .map(([k, v]) => ({ value: k, frequency: v }))
         .sort((a, b) => b.frequency - a.frequency);
+    if (sorted.length === sorted.reduce((tot, v) => tot + v.frequency, 0)) {
+        return 0;
+    }
     return Number(sorted?.[0]?.value) ?? 0;
 };
 exports.findMode = findMode;
-const getDividendFrequency = (dates) => {
+const getDividendYearPayments = (dates) => {
     const countPerYear = {};
     for (const date of dates) {
         const year = date.getFullYear();
         countPerYear[year] = (countPerYear[year] ?? 0) + 1;
     }
+    return countPerYear;
+};
+exports.getDividendYearPayments = getDividendYearPayments;
+const getDividendFrequency = (dates) => {
+    const countPerYear = (0, exports.getDividendYearPayments)(dates);
     let frequency = 0; //0 means no dividends
     frequency = Math.floor((0, exports.findMode)(Object.values(countPerYear)));
     return frequency;

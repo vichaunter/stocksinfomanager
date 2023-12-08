@@ -89,13 +89,28 @@ class FilesystemDatabaseHandler extends DatabaseHandler_1.default {
         const rawData = await readAndDecompressFile(tickerFile);
         return rawData;
     }
-    async getTickers() {
-        const list = await this.getTickersList();
+    async getTickers(args) {
+        let list = await this.getTickersList();
         const data = [];
+        if (args.tickers) {
+            list = list.filter((ticker) => args.tickers.includes(ticker));
+        }
         for (let i = 0; i < list.length; i++) {
             const symbol = list[i];
             const ticker = await this.getTicker(symbol);
-            ticker && data.push(ticker);
+            if (ticker) {
+                if (args?.withPrice && !ticker.price)
+                    continue;
+                if (args?.withDividend && !ticker.payDividend)
+                    continue;
+                if (args?.maxDivYield &&
+                    (!ticker.dividendYield || ticker.dividendYield >= args.maxDivYield))
+                    continue;
+                if (args?.minDivYield &&
+                    (!ticker.dividendYield || ticker.dividendYield <= args.minDivYield))
+                    continue;
+                data.push(ticker);
+            }
         }
         dev_1.default.log("FSDBH getTickers:", data);
         //TODO: check this

@@ -41,7 +41,7 @@ const resolvers = {
             return await database_1.default.getTicker(symbol);
         },
         async tickers(root, args, context, info) {
-            return await database_1.default.getTickers();
+            return await database_1.default.getTickers(args);
         },
         async rawTicker(_, { symbol }) {
             return await database_1.default.getRawTicker(symbol);
@@ -78,6 +78,17 @@ const resolvers = {
                 else {
                     throw new Error("Missing symbol parameter");
                 }
+            }
+            catch (e) {
+                return {
+                    error: e,
+                };
+            }
+        },
+        async updateAllFromRaw(_) {
+            try {
+                await updater_1.default.updateFromStoredRaw();
+                return true;
             }
             catch (e) {
                 return {

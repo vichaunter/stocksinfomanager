@@ -2,6 +2,7 @@ import { PrismaClient, TickerHandler } from "@prisma/client";
 import pc from "picocolors";
 import TickerModel from "../../models/tickerModel";
 import DatabaseHandler, { DbGetTickersParams } from "./DatabaseHandler";
+import { ApiTickersArgs } from "../../api/resolvers";
 
 class MongoDBDatabaseHandler extends DatabaseHandler {
   getRawTicker(symbol: string): Promise<Record<string, any>> {
@@ -44,11 +45,7 @@ class MongoDBDatabaseHandler extends DatabaseHandler {
     return result;
   }
 
-  async getTickers({
-    historical = false,
-    financials = false,
-    dividends = false,
-  }: Partial<DbGetTickersParams> = {}): Promise<TickerModel[] | null> {
+  async getTickers(args: ApiTickersArgs): Promise<TickerModel[] | null> {
     const result = await this.prisma.ticker.findMany({
       include: {
         tickerData: true,

@@ -27,8 +27,8 @@ class Database {
             .sort((a, b) => (0, dayjs_1.default)(a.updatedAt).unix() - (0, dayjs_1.default)(b.updatedAt).unix())?.[0];
         return nextTicker;
     }
-    async getTickers() {
-        return this.handler.getTickers();
+    async getTickers(args) {
+        return this.handler.getTickers(args);
     }
     async getTickersList() {
         return this.handler.getTickersList();

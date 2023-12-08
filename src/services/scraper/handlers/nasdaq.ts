@@ -53,21 +53,21 @@ const rawToTicker = <T extends NasdaqRawData>(
 
   model.symbol = symbol;
 
-  const price = raw.main?.primaryData.lastSalePrice;
+  const price = raw?.main?.primaryData.lastSalePrice;
   if (price) {
     model.setPrice(price);
   }
 
-  const dividendYield = raw.dividends?.yield;
+  const dividendYield = raw?.dividends?.yield;
   if (dividendYield) model.setDividendYield(dividendYield);
 
-  const dividendAnnualPayout = raw.dividends?.annualizedDividend;
+  const dividendAnnualPayout = raw?.dividends?.annualizedDividend;
   if (dividendAnnualPayout) model.setDividendAnnualPayout(dividendAnnualPayout);
 
-  const dividendPayoutRatio = raw.dividends?.payoutRatio;
+  const dividendPayoutRatio = raw?.dividends?.payoutRatio;
   if (dividendPayoutRatio) model.setDividendPayoutRatio(dividendPayoutRatio);
 
-  const dividendDates = raw.dividends?.dividends.rows?.[0];
+  const dividendDates = raw?.dividends?.dividends.rows?.[0];
   if (dividendDates) {
     model.setDividendExDate(dividendDates.exOrEffDate);
     model.setDividendPayoutDate(dividendDates.paymentDate);

@@ -39,7 +39,7 @@ class MongoDBDatabaseHandler extends DatabaseHandler_1.default {
         });
         return result;
     }
-    async getTickers({ historical = false, financials = false, dividends = false, } = {}) {
+    async getTickers(args) {
         const result = await this.prisma.ticker.findMany({
             include: {
                 tickerData: true,

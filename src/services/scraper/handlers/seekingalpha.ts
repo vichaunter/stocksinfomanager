@@ -136,55 +136,55 @@ const rawToTicker = <T extends SeekingAlphaData>(
   raw: T
 ): TickerModel => {
   let model = new TickerModel();
-
   model.symbol = symbol;
 
-  const price = raw?.scorecard["price"];
+  if (!raw) return;
+
+  const price = raw.scorecard?.["price"];
   if (price) model.setPrice(price);
 
-  const name = raw.scorecard["name"];
+  const name = raw.scorecard?.["name"];
   if (name) model.setName(name);
 
   //TODO: move next ones to loop
-  const dividendYield = raw?.scorecard["Div Yield (FWD)"];
+  const dividendYield = raw.scorecard?.["Div Yield (FWD)"];
   if (dividendYield) model.setDividendYield(dividendYield);
 
-  const payDividend = raw?.scorecard["payDividend"];
+  const payDividend = raw.scorecard?.["payDividend"];
   if (payDividend) model.setPayDividend(payDividend);
 
-  const dividendYearsGrowhth = raw?.scorecard["Dividend Growth"];
+  const dividendYearsGrowhth = raw.scorecard?.["Dividend Growth"];
   if (dividendYearsGrowhth) model.setDividendYearsGrowhth(dividendYearsGrowhth);
 
-  const dividend5YearGrowhthRate = raw?.scorecard["5 Year Growth Rate"];
+  const dividend5YearGrowhthRate = raw.scorecard?.["5 Year Growth Rate"];
   if (dividend5YearGrowhthRate)
     model.setDividend5YearGrowhthRate(dividend5YearGrowhthRate);
 
-  const dividendAnnualPayout = raw?.scorecard["Annual Payout (FWD)"];
+  const dividendAnnualPayout = raw.scorecard?.["Annual Payout (FWD)"];
   if (dividendAnnualPayout) model.setDividendAnnualPayout(dividendAnnualPayout);
 
-  const dividendAmount = raw?.scorecard["Amount"];
+  const dividendAmount = raw.scorecard?.["Amount"];
   if (dividendAmount) model.setDividendAmount(dividendAmount);
 
-  const dividendPayoutRatio = raw?.scorecard["Payout Ratio"];
+  const dividendPayoutRatio = raw.scorecard?.["Payout Ratio"];
   if (dividendPayoutRatio) model.setDividendPayoutRatio(dividendPayoutRatio);
 
-  const dividendExDate = raw?.scorecard["Ex-Div Date"];
+  const dividendExDate = raw.scorecard?.["Ex-Div Date"];
   if (dividendExDate) model.setDividendExDate(dividendExDate);
 
-  const dividendPayoutDate = raw?.scorecard["Payout Date"];
+  const dividendPayoutDate = raw.scorecard?.["Payout Date"];
   if (dividendPayoutDate) model.setDividendPayoutDate(dividendPayoutDate);
 
-  const dividendRecordDate = raw?.scorecard["Record Date"];
+  const dividendRecordDate = raw.scorecard?.["Record Date"];
   if (dividendRecordDate) model.setDividendRecordDate(dividendRecordDate);
 
-  const dividendDeclareDate = raw?.scorecard["Declare Date"];
+  const dividendDeclareDate = raw.scorecard?.["Declare Date"];
   if (dividendDeclareDate) model.setDividendDeclareDate(dividendDeclareDate);
 
-  const dividendFrequency = raw?.scorecard["Div Frequency"];
+  const dividendFrequency = raw.scorecard?.["Div Frequency"];
   if (dividendFrequency)
     model.setDividendFrequency(FREQUENCYMAP["dividendFrequency"]);
 
-  console.log("alphaseek", { raw });
   return model;
 };
 

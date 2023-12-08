@@ -38,13 +38,21 @@ const apolloQueryToMongoProjection = (fieldNodes) => {
   return projection;
 };
 
+export type ApiTickersArgs = {
+  tickers?: string[];
+  withDividend: boolean;
+  withPrice: boolean;
+  minDivYield: number;
+  maxDivYield: number;
+};
+
 const resolvers = {
   Query: {
     async ticker(_, { symbol }) {
       return await database.getTicker(symbol);
     },
-    async tickers(root, args, context, info) {
-      return await database.getTickers();
+    async tickers(root, args: ApiTickersArgs, context, info) {
+      return await database.getTickers(args);
     },
     async rawTicker(_, { symbol }) {
       return await database.getRawTicker(symbol);
@@ -84,6 +92,17 @@ const resolvers = {
         } else {
           throw new Error("Missing symbol parameter");
         }
+      } catch (e) {
+        return {
+          error: e,
+        };
+      }
+    },
+    async updateAllFromRaw(_) {
+      try {
+        await updater.updateFromStoredRaw();
+
+        return true;
       } catch (e) {
         return {
           error: e,

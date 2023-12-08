@@ -31,6 +31,7 @@ const database_1 = __importDefault(require("../services/database"));
 const scraperHandlers = __importStar(require("../services/scraper/handlers"));
 const utils_1 = require("../utils");
 const dayjs_1 = __importDefault(require("dayjs"));
+const dev_1 = __importDefault(require("../dev"));
 class TickerModel {
     constructor(ticker) {
         this.handlers = [];
@@ -142,7 +143,7 @@ class TickerModel {
         return {};
     }
     getDefaultHandlers() {
-        console.log("getDefaultHandlers...");
+        dev_1.default.log("getDefaultHandlers...");
         return this.getHandlersWithDefault().map((d) => ({
             id: d.name,
             tickerId: this.id,
@@ -214,6 +215,9 @@ class TickerModel {
         this.error = error;
         await database_1.default.saveTicker(this);
     }
+    async persist() {
+        this.saveTicker();
+    }
     async saveTicker() {
         try {
             if (this.symbol) {
@@ -237,7 +241,7 @@ class TickerModel {
         }
     }
     getHandlersWithDefault() {
-        console.log({ scraperHandlers });
+        dev_1.default.log({ scraperHandlers });
         return Object.values(scraperHandlers).filter((h) => h.defaultHandler);
     }
 }

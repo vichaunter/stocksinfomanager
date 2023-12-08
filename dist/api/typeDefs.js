@@ -34,7 +34,13 @@ const typeDefs = `#graphql
 
     type Query {
         ticker(symbol: String!): Ticker!
-        tickers: [Ticker]
+        tickers(
+            tickers: [String],
+            withPrice: Boolean, 
+            minDivYield: Float, 
+            maxDivYield: Float,
+            withDividend: Boolean
+          ): [Ticker]
         rawTicker(symbol: String!) : TickerRaw
         nextTickerToUpdate: Ticker
     }
@@ -49,6 +55,7 @@ const typeDefs = `#graphql
     type Mutation {
         createTicker(symbol: String!) : Ticker
         updateTicker(symbol: String!) : Ticker
+        updateAllFromRaw: JSON
     }
 
 `;

@@ -4,6 +4,7 @@ import TickerModel from "../models/tickerModel";
 import DatabaseHandler from "./database/DatabaseHandler";
 import { handlers } from "./database/index";
 import dayjs from "dayjs";
+import { ApiTickersArgs } from "../api/resolvers";
 
 class Database {
   handler: DatabaseHandler;
@@ -38,8 +39,8 @@ class Database {
     return nextTicker;
   }
 
-  async getTickers(): Promise<TickerModel[] | null> {
-    return this.handler.getTickers();
+  async getTickers(args?: ApiTickersArgs): Promise<TickerModel[] | null> {
+    return this.handler.getTickers(args);
   }
 
   async getTickersList(): Promise<string[]> {

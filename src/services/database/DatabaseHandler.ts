@@ -1,5 +1,6 @@
 import { Ticker, TickerHandler } from "@prisma/client";
 import TickerModel from "../../models/tickerModel";
+import { ApiTickersArgs } from "../../api/resolvers";
 
 export type DbGetTickersParams = {
   historical?: boolean;
@@ -20,7 +21,7 @@ abstract class DatabaseHandler {
 
   abstract getTickerHandlers(tickerId: string): Promise<TickerHandler[] | null>;
 
-  abstract getTickers(): Promise<TickerModel[] | null>;
+  abstract getTickers(args?: ApiTickersArgs): Promise<TickerModel[] | null>;
 
   abstract getTickersList(): Promise<string[]>;
 

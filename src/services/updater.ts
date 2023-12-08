@@ -55,7 +55,7 @@ const updateFromRawData = async (symbol: string, handlers) => {
   });
 
   return new TickerModel(_.merge({}, ...Object.values(allHandlersData)));
-};
+}
 
 const updateTicker = async (item: QueueItem) => {
   try {
@@ -103,7 +103,7 @@ const updateTicker = async (item: QueueItem) => {
 
     const response = await Promise.all(promises.flat());
     if (process.env.DEV) return response;
-
+    // console.log({ response });
     // handlers has obligation to store raw data,
     // so lets update from that raw data the item
     const convertedTicker = await updateFromRawData(item.symbol, handlers);

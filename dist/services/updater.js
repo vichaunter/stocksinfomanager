@@ -53,7 +53,24 @@ const getTickerData = async ({ item, url, parser }) => {
         console.log(e);
     }
 };
-const updateFromRawData = async (symbol, handlers) => {
+async function updateFromStoredRaw() {
+    try {
+        const symbols = await database_1.default.getTickersList();
+        for (let symbol of symbols) {
+            const item = await database_1.default.getTicker(symbol);
+            const handlers = [
+                ...(item.handlers || []),
+                ...item.getDefaultHandlers(),
+            ].filter((h) => h.enabled); //remove disabled handlers
+            const tickerModel = await updateFromRawData(symbol, handlers);
+            tickerModel?.persist();
+        }
+    }
+    catch (e) {
+        console.log(e);
+    }
+}
+async function updateFromRawData(symbol, handlers) {
     const raw = await database_1.default.getRawTicker(symbol);
     if (!raw)
         return;
@@ -67,7 +84,7 @@ const updateFromRawData = async (symbol, handlers) => {
         }
     });
     return new tickerModel_1.default(lodash_1.default.merge({}, ...Object.values(allHandlersData)));
-};
+}
 const updateTicker = async (item) => {
     try {
         process.env.DEBUG && console.log("updateTicker_handlers:", item.handlers);
@@ -103,6 +120,7 @@ const updateTicker = async (item) => {
         const response = await Promise.all(promises.flat());
         if (process.env.DEV)
             return response;
+        // console.log({ response });
         // handlers has obligation to store raw data,
         // so lets update from that raw data the item
         const convertedTicker = await updateFromRawData(item.symbol, handlers);
@@ -185,4 +203,5 @@ exports.default = {
     tickerUpdaterService,
     loadStoredTickers,
     updateTicker,
+    updateFromStoredRaw,
 };

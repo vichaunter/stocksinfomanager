@@ -5,6 +5,7 @@ import { HandlersData, ScraperHandler, SortMode } from "../types";
 import * as scraperHandlers from "../services/scraper/handlers";
 import { cleanNumber, formatDate } from "../utils";
 import dayjs from "dayjs";
+import dev from "../dev";
 
 class TickerModel {
   id?: string; // dbId
@@ -170,7 +171,7 @@ class TickerModel {
   }
 
   getDefaultHandlers() {
-    console.log("getDefaultHandlers...");
+    dev.log("getDefaultHandlers...");
     return this.getHandlersWithDefault().map((d) => ({
       id: d.name,
       tickerId: this.id,
@@ -254,6 +255,10 @@ class TickerModel {
     await database.saveTicker(this);
   }
 
+  async persist() {
+    this.saveTicker();
+  }
+
   async saveTicker() {
     try {
       if (this.symbol) {
@@ -278,7 +283,7 @@ class TickerModel {
   }
 
   getHandlersWithDefault(): ScraperHandler<HandlersData>[] {
-    console.log({ scraperHandlers });
+    dev.log({ scraperHandlers });
     return Object.values(scraperHandlers).filter((h) => h.defaultHandler);
   }
 }
