@@ -64,7 +64,7 @@ export const sortObjByKeys = (obj: Record<string, any>) => {
 };
 
 export const findMode = (arr: number[]): number => {
-  if (arr.length === 0) return;
+  if (arr.length === 0) return 0;
 
   const counter: Record<string, number> = {};
   arr.forEach((n) => {
@@ -75,16 +75,27 @@ export const findMode = (arr: number[]): number => {
     .map(([k, v]) => ({ value: k, frequency: v }))
     .sort((a, b) => b.frequency - a.frequency);
 
+  if (sorted.length === sorted.reduce((tot, v) => tot + v.frequency, 0)) {
+    return 0;
+  }
   return Number(sorted?.[0]?.value) ?? 0;
 };
 
-export const getDividendFrequency = (dates: Date[]): number => {
+export const getDividendYearPayments = (
+  dates: Date[]
+): Record<number, number> => {
   const countPerYear = {};
 
   for (const date of dates) {
     const year = date.getFullYear();
     countPerYear[year] = (countPerYear[year] ?? 0) + 1;
   }
+
+  return countPerYear;
+};
+
+export const getDividendFrequency = (dates: Date[]): number => {
+  const countPerYear = getDividendYearPayments(dates);
 
   let frequency = 0; //0 means no dividends
 

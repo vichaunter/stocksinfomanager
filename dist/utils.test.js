@@ -11,33 +11,27 @@ describe("findMode Function", () => {
         expect(mode).toEqual(4);
         expect(modeb).toEqual(1);
     });
-    // Test case: Valid array with a single mode
     it("should return the correct mode for an array with a single mode", () => {
         const testArray1 = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4];
         expect((0, utils_1.findMode)(testArray1)).toBe(4);
     });
-    // Test case: Valid array with multiple modes
     it("should return the correct mode for an array with multiple modes", () => {
         const testArray2 = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4, 5, 5];
         expect((0, utils_1.findMode)(testArray2)).toBe(4);
     });
-    // Test case: Valid array with no mode (all elements occur once)
     it("should return 0 for an array with no mode", () => {
         const testArray3 = [1, 2, 3, 4, 5];
         expect((0, utils_1.findMode)(testArray3)).toBe(0);
     });
-    // Test case: Empty array
     it("should return 0 for an empty array", () => {
         const testArray4 = [];
         expect((0, utils_1.findMode)(testArray4)).toBe(0);
         // Alternatively, you can expect(findMode(testArray4)).toBe(0);
     });
-    // Test case: Array with negative numbers
     it("should return the correct mode for an array with negative numbers", () => {
         const testArray5 = [-2, -1, -1, 0, 1, 1, 1, 2, 2];
         expect((0, utils_1.findMode)(testArray5)).toBe(1);
     });
-    // Test case: Array with decimal numbers
     it("should return the correct mode for an array with decimal numbers", () => {
         const testArray6 = [1.5, 2.5, 2.5, 3.5, 3.5, 3.5, 4.5, 4.5, 4.5, 4.5];
         expect((0, utils_1.findMode)(testArray6)).toBe(4.5);
