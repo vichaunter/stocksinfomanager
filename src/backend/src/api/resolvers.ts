@@ -1,3 +1,4 @@
+import taskController from "../controllers/taskController";
 import TickerModel from "../models/tickerModel";
 import database from "../services/database";
 import updater from "../services/updater";
@@ -65,6 +66,23 @@ const resolvers = {
 
       return await database.getTicker(nextTicker.symbol);
     },
+    async task() {
+      const task = taskController.getTask();
+      if (task) {
+        return { __typename: "Task", ...task };
+      }
+
+      return { __typename: "Error", error: "Nothing to do" };
+    },
+  },
+  TaskResult: {
+    __resolveType(obj) {
+      if (obj.error) {
+        return "Error";
+      }
+
+      return "Task";
+    },
   },
   Mutation: {
     async createTicker(_, { symbol }) {
@@ -108,6 +126,9 @@ const resolvers = {
           error: e,
         };
       }
+    },
+    async taskSource(_, { url, source }) {
+      taskController.setTaskSource({ url, source });
     },
   },
 };

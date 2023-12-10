@@ -1,5 +1,16 @@
 const typeDefs = `#graphql
     scalar JSON
+    scalar Void
+
+    type Error {
+        error: String!
+    }
+
+    type Task {
+        url: String!
+    }
+
+    union TaskResult = Task | Error
 
     type Ticker { 
         id:         String
@@ -41,6 +52,7 @@ const typeDefs = `#graphql
           ): [Ticker]
         rawTicker(symbol: String!) : TickerRaw
         nextTickerToUpdate: Ticker
+        task: TaskResult
     }
 
     input TickerInput {
@@ -54,6 +66,7 @@ const typeDefs = `#graphql
         createTicker(symbol: String!) : Ticker
         updateTicker(symbol: String!) : Ticker
         updateAllFromRaw: JSON
+        taskSource(url: String!, source: String!): Void
     }
 
 `;
