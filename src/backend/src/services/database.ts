@@ -68,6 +68,8 @@ class Database {
   }
 }
 
-const database = new Database(new handlers[process.env.DB_HANDLER]());
+const database = new Database(
+  new handlers[process.env.DB_HANDLER ?? "filesystem"]()
+);
 
 export default database;

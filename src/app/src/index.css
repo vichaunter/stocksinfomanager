@@ -1,0 +1,23 @@
+.mantine-Checkbox-root:hover {
+  font-weight: bold;
+}
+
+.mantine-Checkbox-root:hover input {
+  border: 1px solid dodgerblue;
+}
+
+.spin {
+  animation-name: spin;
+  animation-duration: 1000ms;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(360deg);
+  }
+  to {
+    transform: rotate(0deg);
+  }
+}
