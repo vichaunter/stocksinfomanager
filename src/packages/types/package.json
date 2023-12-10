@@ -1,0 +1,12 @@
+{
+  "name": "@packages/types",
+  "version": "1.0.0",
+  "description": "The Stocks info types",
+  "main": "src/index.ts",
+  "private": true,
+  "scripts": {
+    "build": "rimraf dist && yarn tsc"
+  },
+  "author": "VicHaunter",
+  "license": "ISC"
+}
