@@ -66,7 +66,7 @@ const typeDefs = `#graphql
         createTicker(symbol: String!) : Ticker
         updateTicker(symbol: String!) : Ticker
         updateAllFromRaw: JSON
-        taskSource(url: String!, source: String!): Void
+        setTaskSource(url: String!, source: String!): Void
     }
 
 `;

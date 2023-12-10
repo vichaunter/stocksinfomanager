@@ -127,8 +127,10 @@ const resolvers = {
         };
       }
     },
-    async taskSource(_, { url, source }) {
+    async setTaskSource(_, { url, source }) {
       taskController.setTaskSource({ url, source });
+
+      return { status: "ok" };
     },
   },
 };

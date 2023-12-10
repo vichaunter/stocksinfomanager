@@ -1,6 +1,6 @@
 import { Ticker, TickerHandler } from "@prisma/client";
-import TickerModel from "../../models/tickerModel";
 import { ApiTickersArgs } from "../../api/resolvers";
+import TickerModel from "../../models/tickerModel";
 
 export type DbGetTickersParams = {
   historical?: boolean;

@@ -4,12 +4,12 @@ import { decompressSync, strToU8, zlibSync } from "fflate";
 import fs from "node:fs";
 import path from "node:path";
 import pc from "picocolors";
+import { ApiTickersArgs } from "../../api/resolvers";
 import { PATHS } from "../../constants";
 import dev from "../../dev";
 import TickerModel from "../../models/tickerModel";
 import { formatDate, sortObjByKeys } from "../../utils";
 import DatabaseHandler from "./DatabaseHandler";
-import { ApiTickersArgs } from "../../api/resolvers";
 
 async function compressAndWriteFile(filePath, data) {
   const jsonData = JSON.stringify(data, null, 2);

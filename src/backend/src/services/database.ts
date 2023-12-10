@@ -1,10 +1,10 @@
 import { Ticker, TickerHandler } from "@prisma/client";
+import dayjs from "dayjs";
 import pc from "picocolors";
+import { ApiTickersArgs } from "../api/resolvers";
 import TickerModel from "../models/tickerModel";
 import DatabaseHandler from "./database/DatabaseHandler";
 import { handlers } from "./database/index";
-import dayjs from "dayjs";
-import { ApiTickersArgs } from "../api/resolvers";
 
 class Database {
   handler: DatabaseHandler;

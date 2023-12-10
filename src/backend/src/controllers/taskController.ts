@@ -6,7 +6,10 @@ const processing: Task[] = [];
 
 function getTask(): Task | undefined {
   const task = queue.shift();
-  processing.push(task);
+  if (!task) return;
+
+  const processingTask = getProcessingTask(task.url);
+  !processingTask && processing.push(task);
 
   return task;
 }
