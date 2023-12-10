@@ -38,7 +38,26 @@ const getTickerData = async ({ item, url, parser }: GetTickerDataProps) => {
   }
 };
 
-const updateFromRawData = async (symbol: string, handlers) => {
+async function updateFromStoredRaw() {
+  try {
+    const symbols = await database.getTickersList();
+    for (let symbol of symbols) {
+      const item = await database.getTicker(symbol);
+      const handlers = [
+        ...(item.handlers || []),
+
+        ...item.getDefaultHandlers(),
+      ].filter((h) => h.enabled); //remove disabled handlers
+
+      const tickerModel = await updateFromRawData(symbol, handlers);
+      tickerModel?.persist();
+    }
+  } catch (e) {
+    console.log(e);
+  }
+}
+
+async function updateFromRawData(symbol: string, handlers) {
   const raw = await database.getRawTicker(symbol);
   if (!raw) return;
   //here is all the ticker data from every handler
@@ -201,4 +220,5 @@ export default {
   tickerUpdaterService,
   loadStoredTickers,
   updateTicker,
+  updateFromStoredRaw,
 };
