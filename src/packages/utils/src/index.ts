@@ -39,3 +39,5 @@ export function getPercentColor(percentage: number, median: number) {
 
   return `rgba(${red}, ${green}, ${blue}, 0.5)`;
 }
+
+export const logLine = (message: any) => console.log("=====", message, "=====");

@@ -1,0 +1,31 @@
+{
+  "name": "@services/tunnel",
+  "version": "1.0.0",
+  "description": "The Stocks info service for creating public tunnel to the api",
+  "main": "src/index.ts",
+  "private": true,
+  "scripts": {
+    "start": "nodemon --ignore data/ --esm ./src/index.ts",
+    "build": "rimraf dist && yarn tsc",
+    "ts:check": "yarn tsc --project tsconfig.json",
+    "add-build": "git add dist"
+  },
+  "keywords": [
+    "stocks",
+    "info"
+  ],
+  "author": "VicHaunter",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.2",
+    "cross-env": "^7.0.3",
+    "dotenv": "^16.3.1",
+    "localtunnel": "^2.0.2",
+    "picocolors": "^1.0.0"
+  },
+  "pre-commit": [
+    "ts:check",
+    "build",
+    "add-build"
+  ]
+}

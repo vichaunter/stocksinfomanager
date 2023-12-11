@@ -9,7 +9,8 @@
     "frontend": "yarn --cwd src/app dev --host --port 4001",
     "api": "yarn --cwd src/backend start",
     "start": "concurrently \"yarn frontend\" \"yarn api\"",
-    "service": "yarn --cwd src/services/scraper start"
+    "service:scraper": "yarn --cwd src/services/scraper start",
+    "service:tunnel": "yarn --cwd src/services/tunnel start"
   },
   "workspaces": [
     "src/app",
