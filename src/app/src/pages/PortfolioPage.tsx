@@ -4,19 +4,23 @@ import Table from "../components/tables/Table";
 import usePortfolioStore from "../store/usePortfolioStore";
 import PortfolioEditor from "./Portfolio/PortfolioEditor";
 import PortfolioTotals from "./Portfolio/PortfolioTotals";
+import useFakePortfolioStore from "../store/useFakePortfolioStore";
 
 const PortfolioPage = () => {
   const portfolio = usePortfolioStore((state) => state.portfolio);
   const buys = usePortfolioStore((state) => state.buys);
   const dividends = usePortfolioStore((state) => state.dividends);
 
+  const fakeBuys = useFakePortfolioStore((state) => state.lines);
+  const fakePortfolio = useFakePortfolioStore((state) => state.portfolio);
+
   return (
     <SimpleGrid>
       <h2>Portfolio</h2>
       {portfolio && (
         <PortfolioTotals
-          totals={portfolio}
-          buys={_.compact(buys)}
+          totals={[...portfolio, ...fakePortfolio]}
+          buys={_.compact([...buys, ...fakeBuys])}
           dividends={_.compact(dividends)}
         />
       )}

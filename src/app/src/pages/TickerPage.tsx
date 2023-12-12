@@ -3,11 +3,11 @@ import { Group, Paper, SimpleGrid, Text } from "@mantine/core";
 import dayjs from "dayjs";
 import { FC } from "react";
 import { useParams } from "react-router-dom";
-import { QUERY_TICKER, Ticker } from "../api/queries/tickersQuery";
+import { QUERY_TICKER, ApiTicker } from "../api/queries/tickersQuery";
 import { LABELS } from "../constants";
 import TickerLinks from "../components/blocks/TickerLinks";
 
-const mainInfo: (keyof Ticker)[] = [
+const mainInfo: (keyof ApiTicker)[] = [
   "dividendYield",
   "dividendAnnualPayout",
   "dividendAmount",
@@ -17,7 +17,7 @@ const mainInfo: (keyof Ticker)[] = [
   "dividendFrequency",
 ];
 
-const dateInfo: (keyof Ticker)[] = [
+const dateInfo: (keyof ApiTicker)[] = [
   "dividendExDate",
   "dividendDeclareDate",
   "dividendPayoutDate",
@@ -27,8 +27,8 @@ const dateInfo: (keyof Ticker)[] = [
 ];
 
 type GroupProps = {
-  ticker: Ticker;
-  keys: (keyof Ticker)[];
+  ticker: ApiTicker;
+  keys: (keyof ApiTicker)[];
 };
 const TickerGroup: FC<GroupProps> = ({ ticker, keys }) => {
   const parseValue = (value?: number | string | boolean, type?: string) => {
@@ -66,11 +66,14 @@ const TickerGroup: FC<GroupProps> = ({ ticker, keys }) => {
 
 const TickerPage = () => {
   const { symbol } = useParams();
-  const { loading, error, data } = useQuery<{ ticker: Ticker }>(QUERY_TICKER, {
-    variables: {
-      symbol,
-    },
-  });
+  const { loading, error, data } = useQuery<{ ticker: ApiTicker }>(
+    QUERY_TICKER,
+    {
+      variables: {
+        symbol,
+      },
+    }
+  );
 
   if (loading) return <p>Loading...</p>;
   if (error) return <p>Error : {error.message}</p>;

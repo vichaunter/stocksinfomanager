@@ -1,8 +1,7 @@
-import lodash from "lodash";
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useEffect } from "react";
+import usePortfolioStore from "../store/usePortfolioStore";
 import useEtoro from "./useEtoro";
 import useRevolut from "./useRevolut";
-import usePortfolioStore from "../store/usePortfolioStore";
 
 const BROKERS = {
   etoro: "etoro",
@@ -15,7 +14,7 @@ export type BrokerExtractBuyLine = {
   currency: string;
   units: number;
   date: string;
-  broker: keyof typeof BROKERS;
+  broker: Broker;
 };
 
 export type BrokerExtractDividendLine = {
@@ -23,7 +22,7 @@ export type BrokerExtractDividendLine = {
   amount: number;
   currency: string;
   date: string;
-  broker: keyof typeof BROKERS;
+  broker: Broker;
 };
 
 export type PortfolioData = {
@@ -54,7 +53,7 @@ const useBrokers = (): Return => {
   }, [revolutData, etoroData]);
 
   const brokerHandlers: Record<
-    Broker,
+    Partial<Broker>,
     (e: ChangeEvent<HTMLInputElement>) => void
   > = {
     etoro: onChangeEtoro,

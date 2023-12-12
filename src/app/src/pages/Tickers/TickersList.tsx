@@ -14,7 +14,7 @@ import relativeTime from "dayjs/plugin/relativeTime";
 import { FC, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  Tickers as ApiTickers,
+  ApiTickers,
   ApiTickersFilters,
   QUERY_TICKERS,
 } from "../../api/queries/tickersQuery";

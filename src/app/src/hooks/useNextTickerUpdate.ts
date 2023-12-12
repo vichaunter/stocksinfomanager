@@ -1,12 +1,12 @@
 import { useLazyQuery } from "@apollo/client";
 import { useEffect, useState } from "react";
-import { QUERY_TICKER_TO_UPDATE, Ticker } from "../api/queries/tickersQuery";
+import { QUERY_TICKER_TO_UPDATE, ApiTicker } from "../api/queries/tickersQuery";
 
 const useNextTickerUpdate = () => {
   const [autoUpdating, setAutoUpdating] = useState(false);
 
   const [_, { loading, error, data, refetch }] = useLazyQuery<{
-    nextTickerToUpdate: Ticker;
+    nextTickerToUpdate: ApiTicker;
   }>(QUERY_TICKER_TO_UPDATE);
 
   useEffect(() => {

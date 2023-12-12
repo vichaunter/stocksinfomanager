@@ -1,10 +1,10 @@
 import { useQuery } from "@apollo/client";
-import { Flex, SimpleGrid, Table, Text } from "@mantine/core";
+import { Flex, NumberFormatter, SimpleGrid, Table, Text } from "@mantine/core";
 import { getPercentColor } from "@packages/utils";
 import { IconRefresh } from "@tabler/icons-react";
 import _ from "lodash";
 import { FC, useEffect, useMemo } from "react";
-import { QUERY_TICKERS, Tickers } from "../../api/queries/tickersQuery";
+import { QUERY_TICKERS, ApiTickers } from "../../api/queries/tickersQuery";
 import {
   BrokerExtractBuyLine,
   BrokerExtractDividendLine,
@@ -12,6 +12,7 @@ import {
 } from "../../hooks/useBrokers";
 import useUpdateTicker from "../../hooks/useUpdateTicker";
 import InfostatBlock from "../../components/blocks/InfostatBlock";
+import NumberCurrency from "../../components/text/NumberCurrency";
 
 const HEADS = [
   "Ticker",
@@ -54,7 +55,6 @@ const PortfolioTotals: FC<Props> = ({ totals, buys, dividends }) => {
     [totals]
   );
 
-  console.log({ totals });
   const getPercentage = (amount: number) => (amount / totalInvested) * 100;
   const percentMedian =
     buys?.reduce((acc, cur) => {
@@ -68,7 +68,7 @@ const PortfolioTotals: FC<Props> = ({ totals, buys, dividends }) => {
     loading: loadingUpdateTicker,
   } = useUpdateTicker();
 
-  const { data, refetch } = useQuery<{ tickers: Tickers }>(QUERY_TICKERS, {
+  const { data, refetch } = useQuery<{ tickers: ApiTickers }>(QUERY_TICKERS, {
     variables: {
       tickers: tickersList,
     },
@@ -111,45 +111,56 @@ const PortfolioTotals: FC<Props> = ({ totals, buys, dividends }) => {
         <InfostatBlock
           title="Total invested"
           value={totalInvested}
-          secondLineValue={"$ " + totalNeededForGoal.toFixed(2)}
-          prefix="$"
-          secondLineLegend={`remaining $ ${(
-            totalNeededForGoal - totalInvested
-          ).toFixed(2)}`}
+          secondLineValue={<NumberCurrency value={totalNeededForGoal} />}
+          secondLineLegend={
+            <NumberCurrency
+              value={totalNeededForGoal - totalInvested}
+              prefix="remaining $"
+            />
+          }
         />
         <InfostatBlock
           title="Total current value"
           value={totalCurrentValue}
           previousValue={totalInvested}
-          prefix="$"
         />
         <InfostatBlock
           title="Total dividends received"
           value={dividendReceived}
-          prefix="$"
         />
         <InfostatBlock
           title="Yearly Dividend Expected"
           value={expectedAnnualDividends}
-          prefix="$"
           positive
-          secondLineValue={`${(
-            (expectedAnnualDividends * 100) /
-            totalInvested
-          ).toFixed(2)} %`}
+          secondLineValue={
+            <NumberCurrency
+              value={(expectedAnnualDividends * 100) / totalInvested}
+              suffix="%"
+              prefix={false}
+            />
+          }
           secondLineLegend={"YIELD"}
         />
         <InfostatBlock
           title="Monthly Dividend Expected"
           value={expectedAnnualDividends / 12}
-          prefix="$"
         />
         <InfostatBlock
           title="Monthly Goal"
           value={goal}
-          prefix="$"
-          secondLineValue={currentPercentegeReached.toFixed(2) + "%"}
-          secondLineLegend={(goal - expectedMonthlyDividends).toFixed(2)}
+          secondLineValue={
+            <NumberCurrency
+              value={currentPercentegeReached}
+              suffix="%"
+              prefix={false}
+            />
+          }
+          secondLineLegend={
+            <NumberCurrency
+              value={goal - expectedMonthlyDividends}
+              prefix="remaining $"
+            />
+          }
         />
       </SimpleGrid>
       <Table>

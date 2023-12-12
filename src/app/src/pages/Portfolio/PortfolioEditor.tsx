@@ -1,33 +1,30 @@
-import { Flex, Input, InputLabel, Paper } from "@mantine/core";
-import useBrokersExtract from "../../hooks/useBrokers";
-import dayjs from "dayjs";
+import { Box, Collapse, Flex, Paper } from "@mantine/core";
+import BrokersForm from "../../components/forms/BrokersForm";
+import FakeTickerForm from "../../components/forms/FakeTickerForm";
+import { useDisclosure } from "@mantine/hooks";
+import { IconChevronDown, IconChevronUp } from "@tabler/icons-react";
 
 const PortfolioEditor = ({}) => {
-  const { updateData } = useBrokersExtract();
+  const [opened, { toggle }] = useDisclosure(true);
 
+  const ChevronIcon = opened ? IconChevronUp : IconChevronDown;
   return (
     <>
-      <h2>Upload data</h2>
-      <Paper withBorder p="md" radius="md">
-        <Flex justify={"space-between"}>
-          <InputLabel p={"md"}>
-            Etoro (
-            <a
-              target="_blank"
-              href={`https://www.etoro.com/documents/accountstatement/2009-01-01/${dayjs(
-                new Date()
-              ).format("YYYY-MM-DD")}`}
-            >
-              xlsx
-            </a>
-            ):
-            <Input type="file" onChange={(e) => updateData("etoro", e)} />
-          </InputLabel>
-          <InputLabel p="md">
-            Revolut (csv):
-            <Input type="file" onChange={(e) => updateData("revolut", e)} />
-          </InputLabel>
+      <Paper withBorder p="md" pt={0} pb={opened ? "md" : 0} radius="md">
+        <Flex
+          justify="space-between"
+          onClick={toggle}
+          style={{ cursor: "pointer" }}
+          align="center"
+        >
+          <h3>Data upload/edit form</h3> <ChevronIcon />
         </Flex>
+        <Collapse in={opened}>
+          <h4>Add Fake Ticker</h4>
+          <FakeTickerForm />
+          <h4>Upload brokers data</h4>
+          <BrokersForm />
+        </Collapse>
       </Paper>
     </>
   );

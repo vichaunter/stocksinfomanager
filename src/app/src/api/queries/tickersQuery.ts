@@ -78,7 +78,7 @@ export const QUERY_LOCAL_FAVORITES = gql`
   }
 `;
 
-export type Ticker = {
+export type ApiTicker = {
   id: string;
   symbol: string;
   price?: number;
@@ -101,4 +101,4 @@ export type Ticker = {
   updatedAt?: string;
 };
 
-export type Tickers = Ticker[];
+export type ApiTickers = ApiTicker[];

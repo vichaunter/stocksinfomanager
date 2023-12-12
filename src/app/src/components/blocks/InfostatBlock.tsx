@@ -1,11 +1,12 @@
 import { Flex, Group, Paper, Text, ThemeIcon } from "@mantine/core";
 import { IconArrowDownRight, IconArrowUpRight } from "@tabler/icons-react";
-import { FC } from "react";
+import React, { FC } from "react";
+import NumberCurrency from "../text/NumberCurrency";
 
 type SecondLineProps = {
   isNegative: boolean;
-  value: string;
-  legend?: string;
+  value: number | string | React.ReactElement;
+  legend?: number | string | React.ReactElement;
 };
 const SecondLine: FC<SecondLineProps> = ({ isNegative, value, legend }) => {
   return (
@@ -26,12 +27,12 @@ type Props = {
   title: string;
   value: number;
   previousValue?: number;
-  prefix?: string;
+  prefix?: string | boolean;
   suffix?: string;
   positive?: boolean;
   negative?: boolean;
-  secondLineValue?: string | number;
-  secondLineLegend?: string | number;
+  secondLineValue?: string | number | React.ReactElement;
+  secondLineLegend?: string | number | React.ReactElement;
 };
 const InfostatBlock: FC<Props> = ({
   title,
@@ -59,7 +60,7 @@ const InfostatBlock: FC<Props> = ({
             {title}
           </Text>
           <Text fw={700} fz="xl">
-            {prefix} {value.toFixed(2)} {suffix}
+            <NumberCurrency value={value} suffix={suffix} prefix={prefix} />
           </Text>
         </div>
         {(diff || isPositive || isNegative) && (
@@ -80,13 +81,13 @@ const InfostatBlock: FC<Props> = ({
       </Group>
       {secondLineValue ? (
         <SecondLine
-          value={`${secondLineValue}`}
-          legend={`${secondLineLegend || ""}`}
+          value={secondLineValue}
+          legend={secondLineLegend || ""}
           isNegative={isNegative}
         />
       ) : diff ? (
         <SecondLine
-          value={`${diff.toFixed(2)}%`}
+          value={diff}
           isNegative={isNegative}
           legend={
             previousValue
