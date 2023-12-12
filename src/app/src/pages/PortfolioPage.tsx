@@ -1,21 +1,15 @@
-import { Flex, Input, InputLabel, Paper, SimpleGrid } from "@mantine/core";
-import PortfolioTotals from "../components/portfolio/PortfolioTotals";
-import Table from "../components/tables/Table";
-import useBrokersExtract, {
-  BrokerExtractBuyLine,
-  BrokerExtractDividendLine,
-} from "../hooks/useBrokersExtract";
+import { SimpleGrid } from "@mantine/core";
 import _ from "lodash";
-import dayjs from "dayjs";
+import Table from "../components/tables/Table";
+import usePortfolioStore from "../store/usePortfolioStore";
+import PortfolioEditor from "./Portfolio/PortfolioEditor";
+import PortfolioTotals from "./Portfolio/PortfolioTotals";
 
 const PortfolioPage = () => {
-  const { portfolio, data, updateData } = useBrokersExtract();
+  const portfolio = usePortfolioStore((state) => state.portfolio);
+  const buys = usePortfolioStore((state) => state.buys);
+  const dividends = usePortfolioStore((state) => state.dividends);
 
-  const buys = _.flatten(data.map((p) => p.buys)) as BrokerExtractBuyLine[];
-  const dividends = _.flatten(
-    data.map((p) => p.dividends)
-  ) as BrokerExtractDividendLine[];
-  console.log(portfolio);
   return (
     <SimpleGrid>
       <h2>Portfolio</h2>
@@ -27,28 +21,8 @@ const PortfolioPage = () => {
         />
       )}
 
-      <h2>Upload data</h2>
-      <Paper withBorder p="md" radius="md">
-        <Flex justify={"space-between"}>
-          <InputLabel p={"md"}>
-            Etoro (
-            <a
-              target="_blank"
-              href={`https://www.etoro.com/documents/accountstatement/2009-01-01/${dayjs(
-                new Date()
-              ).format("YYYY-MM-DD")}`}
-            >
-              xlsx
-            </a>
-            ):
-            <Input type="file" onChange={(e) => updateData("etoro", e)} />
-          </InputLabel>
-          <InputLabel p="md">
-            Revolut (csv):
-            <Input type="file" onChange={(e) => updateData("revolut", e)} />
-          </InputLabel>
-        </Flex>
-      </Paper>
+      <PortfolioEditor />
+
       <h2>Buys</h2>
       <Table
         headers={["Broker", "Ticker", "Amount", "Units", "Date"]}

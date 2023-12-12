@@ -7,7 +7,7 @@ import {
   BrokerExtractBuyLine,
   BrokerExtractDividendLine,
   PortfolioData,
-} from "./useBrokersExtract";
+} from "./useBrokers";
 dayjs.locale("es");
 // export type EtoroData = {
 //   "Cambio de capital realizado": 0;
@@ -77,14 +77,17 @@ const VALID_OPERATIONS = Object.keys(TYPES);
 
 const useEtoro = (): [PortfolioData, (event: any) => any] => {
   const [raw, setRaw] = useState<any[]>([]);
-  const [data, setData] = useState<PortfolioData>({});
+  const [data, setData] = useState<PortfolioData>({
+    buys: [],
+    dividends: [],
+  });
 
   const parseData = (raw: any[]): PortfolioData => {
     const headers = raw.shift();
-    if (!headers) return {};
+    if (!headers) return data;
     const keyTranslation = headsMap.find((hm) => hm?.[headers[0]]);
 
-    if (!keyTranslation) return {};
+    if (!keyTranslation) return data;
 
     let buys: BrokerExtractBuyLine[] = [];
     let dividends: BrokerExtractDividendLine[] = [];

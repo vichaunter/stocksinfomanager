@@ -9,9 +9,9 @@ import {
   BrokerExtractBuyLine,
   BrokerExtractDividendLine,
   Portfolio,
-} from "../../hooks/useBrokersExtract";
+} from "../../hooks/useBrokers";
 import useUpdateTicker from "../../hooks/useUpdateTicker";
-import InfostatBlock from "../blocks/InfostatBlock";
+import InfostatBlock from "../../components/blocks/InfostatBlock";
 
 const HEADS = [
   "Ticker",
@@ -54,6 +54,7 @@ const PortfolioTotals: FC<Props> = ({ totals, buys, dividends }) => {
     [totals]
   );
 
+  console.log({ totals });
   const getPercentage = (amount: number) => (amount / totalInvested) * 100;
   const percentMedian =
     buys?.reduce((acc, cur) => {
@@ -87,6 +88,22 @@ const PortfolioTotals: FC<Props> = ({ totals, buys, dividends }) => {
     return acc + (info?.price ? info?.price * cur.units : 0);
   }, 0);
 
+  const expectedAnnualDividends = _.sum(
+    totals.map((t) => {
+      const dataTicker = data.tickers.find(
+        (ticker) => ticker.symbol === t.ticker
+      );
+      if (!dataTicker?.dividendAnnualPayout) return 0;
+      return dataTicker?.dividendAnnualPayout * t.units;
+    })
+  );
+  const expectedMonthlyDividends = expectedAnnualDividends / 12;
+  const dividendReceived = _.sumBy(dividends, "amount");
+  const goal = 2000;
+  const currentPercentegeReached =
+    ((expectedAnnualDividends / 12) * 100) / goal;
+  const totalNeededForGoal = (goal * totalInvested) / expectedMonthlyDividends;
+
   const resume = (
     <>
       <h3>Resume</h3>
@@ -94,18 +111,45 @@ const PortfolioTotals: FC<Props> = ({ totals, buys, dividends }) => {
         <InfostatBlock
           title="Total invested"
           value={totalInvested}
+          secondLineValue={"$ " + totalNeededForGoal.toFixed(2)}
           prefix="$"
+          secondLineLegend={`remaining $ ${(
+            totalNeededForGoal - totalInvested
+          ).toFixed(2)}`}
         />
         <InfostatBlock
           title="Total current value"
           value={totalCurrentValue}
           previousValue={totalInvested}
           prefix="$"
-        />{" "}
+        />
         <InfostatBlock
           title="Total dividends received"
-          value={_.sumBy(dividends, "amount")}
+          value={dividendReceived}
           prefix="$"
+        />
+        <InfostatBlock
+          title="Yearly Dividend Expected"
+          value={expectedAnnualDividends}
+          prefix="$"
+          positive
+          secondLineValue={`${(
+            (expectedAnnualDividends * 100) /
+            totalInvested
+          ).toFixed(2)} %`}
+          secondLineLegend={"YIELD"}
+        />
+        <InfostatBlock
+          title="Monthly Dividend Expected"
+          value={expectedAnnualDividends / 12}
+          prefix="$"
+        />
+        <InfostatBlock
+          title="Monthly Goal"
+          value={goal}
+          prefix="$"
+          secondLineValue={currentPercentegeReached.toFixed(2) + "%"}
+          secondLineLegend={(goal - expectedMonthlyDividends).toFixed(2)}
         />
       </SimpleGrid>
       <Table>
@@ -120,6 +164,7 @@ const PortfolioTotals: FC<Props> = ({ totals, buys, dividends }) => {
           {totals?.map(({ ticker, units, amount }) => {
             const info = getTickerInfo(ticker);
             const percentage = getPercentage(amount);
+
             return (
               <Table.Tr key={`row-${ticker}`}>
                 <Table.Td>{ticker}</Table.Td>

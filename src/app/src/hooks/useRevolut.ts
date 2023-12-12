@@ -5,7 +5,7 @@ import {
   BrokerExtractBuyLine,
   BrokerExtractDividendLine,
   PortfolioData,
-} from "./useBrokersExtract";
+} from "./useBrokers";
 
 export type RevolutData = {
   Date: string;
@@ -35,7 +35,7 @@ const useRevolut = (): [
   (event: ChangeEvent<HTMLInputElement>) => any
 ] => {
   const [headers, setHeaders] = useState<RevolutHeaders>();
-  const [data, setData] = useState<PortfolioData>({});
+  const [data, setData] = useState<PortfolioData>({ buys: [], dividends: [] });
 
   const parse = (data: RevolutData[]): PortfolioData => {
     const buys: BrokerExtractBuyLine[] = [];
