@@ -60,6 +60,11 @@ function parseScorecard(source: string) {
   const raw = {};
   const $ = cheerioLoad(source);
 
+  const notFound = $('div:contains("Whoops")');
+  if (notFound.length > 0) {
+    return raw;
+  }
+
   const head = $("h1:first");
   const name = head.find("span:eq(1)")?.text();
   if (name) raw["name"] = name;

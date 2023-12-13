@@ -162,9 +162,34 @@ type HistoricalData = {
   tradesTable: HistoricalTradesTable;
 };
 
+type ProfileItem = {
+  label: string;
+  value: string;
+};
+type ProfileData = {
+  ModuleTitle: ProfileItem;
+  CompanyName: ProfileItem;
+  Symbol: ProfileItem;
+  Address: ProfileItem;
+  Phone: ProfileItem;
+  Industry: ProfileItem;
+  Sector: ProfileItem;
+  Region: ProfileItem;
+  CompanyDescription: ProfileItem;
+  CompanyUrl: ProfileItem;
+  KeyExecutives: {
+    label: string;
+    value: {
+      name: string;
+      title: string;
+    }[];
+  };
+};
+
 export type NasdaqRawData = {
   main: Main;
   financials: FinancialsData;
   dividends: DividendsData;
   historical: HistoricalData;
+  profile: ProfileData;
 };

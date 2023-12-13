@@ -2,7 +2,12 @@ import dayjs from "dayjs";
 import ScraperError from "../../../errors/scraperError";
 import TickerModel from "../../../models/tickerModel";
 import { ScraperHandler } from "../../../types";
-import { formatDate, getDividendFrequency, sleep } from "../../../utils";
+import {
+  formatDate,
+  getDividendFrequency,
+  getLastYearsPayingCount,
+  sleep,
+} from "../../../utils";
 import database from "../../database";
 import { NasdaqRawData } from "./types/nasdaqTypes";
 
@@ -15,6 +20,7 @@ const apiUrl = `https://api.nasdaq.com/api`;
 
 const getUrls = (symbol: string) => ({
   main: `https://api.nasdaq.com/api/quote/${symbol}/info?assetclass=stocks`,
+  profile: `https://api.nasdaq.com/api/company/${symbol}/company-profile`,
   financials: `${apiUrl}/company/${symbol}/financials?frequency=1`,
   dividends: `${apiUrl}/quote/${symbol}/dividends?assetclass=stocks`,
   historical: `${apiUrl}/quote/${symbol}/historical?assetclass=stocks&fromdate=1900-01-01&limit=99999&todate=${dayjs(
@@ -58,6 +64,12 @@ const rawToTicker = <T extends NasdaqRawData>(
     model.setPrice(price);
   }
 
+  const sector = raw?.profile?.Sector.value;
+  if (sector) model.setSector(sector);
+
+  const industry = raw?.profile?.Industry.value;
+  if (industry) model.setIndustry(industry);
+
   const dividendYield = raw?.dividends?.yield;
   if (dividendYield) model.setDividendYield(dividendYield);
 
@@ -84,6 +96,10 @@ const rawToTicker = <T extends NasdaqRawData>(
   if (exDates?.length) {
     const frequency = getDividendFrequency(exDates);
     model.setDividendFrequency(frequency);
+
+    const lastYearsPayingCount = getLastYearsPayingCount(exDates);
+    console.log({ lastYearsPayingCount });
+    model.setDividendLastYearsPayingCount(lastYearsPayingCount);
   }
 
   return model;
