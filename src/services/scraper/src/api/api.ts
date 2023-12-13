@@ -53,6 +53,7 @@ class Api {
   }
 
   async sendTaskResult(url: string, source: string) {
+    //TODO: send compressed data
     return await axios({
       ...this.baseRequest,
       data: this.getGraphqlRequest("SetTaskSource", MUTATIONS.setTaskSource, {
