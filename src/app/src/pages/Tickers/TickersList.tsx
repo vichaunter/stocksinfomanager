@@ -29,6 +29,7 @@ const COLUMNS = [
   { id: "price", name: "Price" },
   { id: "dividendAnnualPayout", name: "Div Annual Payout" },
   { id: "dividendYield", name: "Div Yield" },
+  { id: "dividendLastYearsPayingCount", name: "Div Y paying" },
   { id: "dividendYearsGrowhth", name: "Div Y growth" },
   { id: "dividendFrequency", name: "Div Freq" },
   { id: "updatedAt", name: "LastUpdate" },
@@ -111,6 +112,7 @@ const TickersList: FC<Props> = ({ filters }) => {
         <Table.Td>$ {ticker.price}</Table.Td>
         <Table.Td>$ {ticker.dividendAnnualPayout}</Table.Td>
         <Table.Td>{ticker.dividendYield} %</Table.Td>
+        <Table.Td>{ticker.dividendLastYearsPayingCount}</Table.Td>
         <Table.Td>{ticker.dividendYearsGrowhth}</Table.Td>
         <Table.Td>{ticker.dividendFrequency}</Table.Td>
         <Table.Td>{ticker.updatedAt && ticker.updatedAt.fromNow()}</Table.Td>

@@ -87,12 +87,12 @@ const InfostatBlock: FC<Props> = ({
         />
       ) : diff ? (
         <SecondLine
-          value={diff}
+          value={<NumberCurrency value={diff} prefix={false} suffix="%" />}
           isNegative={isNegative}
           legend={
-            previousValue
-              ? `${prefix} ${(value - previousValue).toFixed(2)}`
-              : undefined
+            previousValue ? (
+              <NumberCurrency value={value - previousValue} prefix={prefix} />
+            ) : undefined
           }
         />
       ) : null}

@@ -17,6 +17,7 @@ import {
   QUERY_TICKERS,
 } from "../../api/queries/tickersQuery";
 import useFakePortfolioStore from "../../store/useFakePortfolioStore";
+import NumberCurrency from "../text/NumberCurrency";
 
 const FakeTickerForm = ({}) => {
   const [ticker, setTicker] = useState("");
@@ -69,7 +70,12 @@ const FakeTickerForm = ({}) => {
     data?.tickers?.map((ticker) => {
       return [
         ticker.symbol,
-        <NumberFormatter prefix="$" value={ticker.price} />,
+        <NumberCurrency value={ticker.price} />,
+        <NumberCurrency
+          value={ticker.dividendYield}
+          suffix="%"
+          prefix={false}
+        />,
         <ActionIcon variant="transparent" color="green" size="xl" radius="md">
           <IconCheck onClick={() => handleOnSelectTicker(ticker)} />
         </ActionIcon>,
@@ -94,7 +100,7 @@ const FakeTickerForm = ({}) => {
         <Table
           striped
           data={{
-            head: ["symbol", "price", "actions"],
+            head: ["symbol", "price", "Div Yield", "actions"],
             body: (!!ticker && tableData) || [],
           }}
         />

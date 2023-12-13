@@ -15,6 +15,7 @@ const mainInfo: (keyof ApiTicker)[] = [
   "dividendPayoutRatio",
   "dividendYearsGrowhth",
   "dividendFrequency",
+  "dividendLastYearsPayingCount",
 ];
 
 const dateInfo: (keyof ApiTicker)[] = [
@@ -84,7 +85,11 @@ const TickerPage = () => {
     <>
       <h1>
         {data.ticker.symbol} - {data.ticker.name}
+        <Text size="sm" c="gray">
+          {data.ticker.sector} / {data.ticker.industry}
+        </Text>
       </h1>
+
       <TickerGroup ticker={data.ticker} keys={mainInfo} />
       <TickerGroup ticker={data.ticker} keys={dateInfo} />
       <TickerLinks symbol={data.ticker.symbol} />

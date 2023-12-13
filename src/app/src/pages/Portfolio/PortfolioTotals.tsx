@@ -13,24 +13,7 @@ import {
 import useUpdateTicker from "../../hooks/useUpdateTicker";
 import InfostatBlock from "../../components/blocks/InfostatBlock";
 import NumberCurrency from "../../components/text/NumberCurrency";
-
-const HEADS = [
-  "Ticker",
-  "Price",
-  "1",
-  "2",
-  "3",
-  "4",
-  "5",
-  "6",
-  "7",
-  "8",
-  "9",
-  "10",
-  "11",
-  "12",
-  "Div Received",
-];
+import DividendYearSummaryTable from "../../components/blocks/DividendYearSummaryTable";
 
 const CALCULATIONS = [
   "Stocks",
@@ -215,59 +198,9 @@ const PortfolioTotals: FC<Props> = ({ totals, buys, dividends }) => {
     </>
   );
 
-  const groupedByTicker = _.groupBy(dividends, "ticker");
-  const dividendPerTickerMonth = _.mapValues(
-    groupedByTicker,
-    (entriesByTicker) => {
-      const groupedByYearMonth = _.groupBy(entriesByTicker, (entry) => {
-        const date = new Date(entry.date);
-        return `${date.getFullYear()}-${date.getMonth() + 1}`;
-      });
-
-      return _.mapValues(groupedByYearMonth, (entriesByYearMonth) =>
-        _.sumBy(entriesByYearMonth, "amount")
-      );
-    }
-  );
-
-  const diviYear = new Date().getFullYear();
   return (
     <>
-      <h2>Year {diviYear}</h2>
-      <Table striped highlightOnHover withTableBorder withColumnBorders>
-        <Table.Thead>
-          <Table.Tr>
-            {HEADS.map((h) => (
-              <Table.Th key={h}>{h}</Table.Th>
-            ))}
-          </Table.Tr>
-        </Table.Thead>
-        <Table.Tbody>
-          {totals.map((row) => {
-            const tickerInfo = getTickerInfo(row.ticker);
-            let divReceived = 0;
-            return (
-              <Table.Tr key={`totals-${row.ticker}`}>
-                <Table.Td>{row.ticker}</Table.Td>
-                <Table.Td>{tickerInfo?.price}</Table.Td>
-                {Array.from(Array(12).keys()).map((m) => {
-                  const monthDividend =
-                    dividendPerTickerMonth?.[row.ticker]?.[
-                      `${diviYear}-${m + 1}`
-                    ];
-                  divReceived += monthDividend ?? 0;
-                  return (
-                    <Table.Td key={`totals-${row.ticker}-${m}`}>
-                      {monthDividend?.toFixed(2)}
-                    </Table.Td>
-                  );
-                })}
-                <Table.Td align="right">{divReceived}</Table.Td>
-              </Table.Tr>
-            );
-          })}
-        </Table.Tbody>
-      </Table>
+      <DividendYearSummaryTable tickers={data.tickers} />
       {resume}
     </>
   );

@@ -28,6 +28,10 @@ export const LABELS: Record<
     name: "Div Y growth",
     suffix: "Years",
   },
+  dividendLastYearsPayingCount: {
+    name: "Div full paid last",
+    suffix: "Years",
+  },
   dividendFrequency: {
     name: "Div Freq",
   },

@@ -6,6 +6,8 @@ export const TickerFragment = gql`
     symbol
     price
     name
+    sector
+    industry
     payDividend
     dividendYield
     dividendAnnualPayout
@@ -18,6 +20,7 @@ export const TickerFragment = gql`
     dividendRecordDate
     dividendDeclareDate
     dividendFrequency
+    dividendLastYearsPayingCount
     nextExDate
     nextPayDate
     error
@@ -83,6 +86,8 @@ export type ApiTicker = {
   symbol: string;
   price?: number;
   name?: string;
+  sector?: string;
+  industry?: string;
   payDividend?: boolean;
   dividendYield?: number;
   dividendAnnualPayout?: number;
@@ -95,6 +100,7 @@ export type ApiTicker = {
   dividendRecordDate?: string;
   dividendDeclareDate?: string;
   dividendFrequency?: string;
+  dividendLastYearsPayingCount?: number;
   nextExDate?: string;
   nextPayDate?: string;
   error?: string;
