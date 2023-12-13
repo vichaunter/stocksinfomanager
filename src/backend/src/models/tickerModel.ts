@@ -13,6 +13,8 @@ class TickerModel {
   symbol: string;
   price?: number;
   name?: string;
+  sector?: string;
+  industry?: string;
 
   payDividend?: boolean;
   dividendYield?: number;
@@ -26,6 +28,7 @@ class TickerModel {
   dividendRecordDate?: string;
   dividendDeclareDate?: string;
   dividendFrequency?: number;
+  dividendLastYearsPayingCount?: number;
   nextExDate?: null;
   nextPayDate?: null;
   //sector
@@ -58,6 +61,14 @@ class TickerModel {
 
   setName(value: string) {
     this.name = value;
+  }
+
+  setSector(value: string) {
+    this.sector = value;
+  }
+
+  setIndustry(value: string) {
+    this.industry = value;
   }
 
   setPayDividend(value: boolean) {
@@ -153,6 +164,10 @@ class TickerModel {
 
   setDividendFrequency(value: number) {
     this.dividendFrequency = value;
+  }
+
+  setDividendLastYearsPayingCount(value: number) {
+    this.dividendLastYearsPayingCount = value;
   }
 
   invalidate() {

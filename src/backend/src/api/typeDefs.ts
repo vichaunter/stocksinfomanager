@@ -17,6 +17,8 @@ const typeDefs = `#graphql
         symbol:     String
         price:      Float
         name:       String
+        sector:       String
+        industry:       String
         payDividend: Boolean
         dividendYield: Float
         dividendAnnualPayout: Float
@@ -29,6 +31,7 @@ const typeDefs = `#graphql
         dividendRecordDate: String
         dividendDeclareDate: String
         dividendFrequency: String
+        dividendLastYearsPayingCount: Float
         nextExDate: String
         nextPayDate: String
         error:      JSON

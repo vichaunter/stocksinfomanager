@@ -29,7 +29,9 @@ class Database {
   }
 
   async getNextTickerToUpdate() {
-    const tickers = await this.getTickers();
+    const tickers = await this.getTickers({
+      withDividend: true,
+    });
     const nextTicker = tickers
       .filter((t) => !t.error)
       .sort(

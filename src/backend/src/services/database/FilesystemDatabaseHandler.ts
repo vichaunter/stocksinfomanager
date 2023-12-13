@@ -126,11 +126,11 @@ class FilesystemDatabaseHandler extends DatabaseHandler {
     return rawData;
   }
 
-  async getTickers(args: ApiTickersArgs): Promise<TickerModel[]> {
+  async getTickers(args?: ApiTickersArgs): Promise<TickerModel[]> {
     let list = await this.getTickersList();
     const data = [];
 
-    if (args.tickers) {
+    if (args?.tickers) {
       if (args.tickers.length === 1) {
         list = list.filter((ticker) =>
           ticker.startsWith(args.tickers[0].trim())

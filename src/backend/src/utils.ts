@@ -1,6 +1,6 @@
 import dayjs, { Dayjs } from "dayjs";
-import getSystemLocale from "system-locale";
 import pc from "picocolors";
+import getSystemLocale from "system-locale";
 import dev from "./dev";
 
 getSystemLocale().then((locale) => {
@@ -102,4 +102,44 @@ export const getDividendFrequency = (dates: Date[]): number => {
   frequency = Math.floor(findMode(Object.values(countPerYear)));
 
   return frequency;
+};
+
+export const sumLastN = (arr: number[], n: number) => {
+  return [...arr].slice(-n).reduce((acc, cur) => {
+    return acc + cur;
+  }, 0);
+};
+
+export const getLastYearsPayingCount = (dates: Date[]): number => {
+  const yearCount = getDividendYearPayments(dates);
+  const yearCountArr = Object.entries(yearCount)
+    .map(([k, v]) => ({
+      year: Number(k),
+      count: Number(v),
+    }))
+    .sort((a, b) => a.year - b.year)
+    .map((y) => y.count);
+
+  const expectedFrequency = findMode(yearCountArr);
+  const margins = {
+    12: 2,
+    4: 1,
+    6: 0,
+    1: 0,
+  };
+
+  let yearsPayingCount = 0;
+  for (let n = 1; n <= yearCountArr.length; n++) {
+    const payments = sumLastN([...yearCountArr].slice(0, -1), n);
+    console.log(payments / n);
+    if (payments / n >= expectedFrequency - margins[expectedFrequency]) {
+      yearsPayingCount++;
+    } else {
+      break;
+    }
+  }
+
+  // TODO: calculate current year based on when can be paid and current date
+
+  return yearsPayingCount;
 };
