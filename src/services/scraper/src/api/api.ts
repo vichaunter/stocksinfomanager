@@ -1,6 +1,10 @@
-import QUERIES from "./queries";
-import MUTATIONS from "./mutations";
 import axios from "axios";
+import dotenv from "dotenv";
+import MUTATIONS from "./mutations";
+import QUERIES from "./queries";
+dotenv.config();
+
+const SCRAPER_ID = process.env.SCRAPER_ID;
 
 class Api {
   baseRequest: axios.AxiosRequestConfig = {};
@@ -24,11 +28,15 @@ class Api {
   ) {
     const request: Record<string, any> = {
       query,
+      variables: {
+        scraperId: SCRAPER_ID,
+      },
     };
 
     if (variables) {
-      request.variables = variables;
+      request.variables = { ...request.variables, ...variables };
     }
+
     if (name) {
       request.operationName = name;
     }
@@ -44,6 +52,7 @@ class Api {
 
     if (response.status === 200) {
       const task = response.data.data.task;
+
       if (task) {
         return task;
       }

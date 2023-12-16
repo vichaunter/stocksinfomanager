@@ -1,6 +1,6 @@
 const MUTATIONS = {
-  setTaskSource: `mutation SetTaskSource($url: String!, $source: String!) {
-    setTaskSource(url: $url, source: $source)
+  setTaskSource: `mutation SetTaskSource($scraperId: String!, $url: String!, $source: String!) {
+    setTaskSource(scraperId: $scraperId, url: $url, source: $source)
   }`,
 };
 

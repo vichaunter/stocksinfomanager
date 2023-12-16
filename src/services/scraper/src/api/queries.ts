@@ -1,7 +1,7 @@
 const QUERIES = {
   task: `
-    query Task {
-      task {
+    query Task($scraperId: String!) {
+      task(scraperId: $scraperId) {
         ... on Task {
           url
         }

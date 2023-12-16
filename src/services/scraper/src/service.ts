@@ -2,11 +2,12 @@ import { logLine } from "@packages/utils";
 import axios from "axios";
 import dotenv from "dotenv";
 import pc from "picocolors";
-import { browser } from ".";
+import browser from "@packages/browser";
 import api from "./api/api";
 dotenv.config();
 
 const REMOTE_CONFIG_URL = process.env.REMOTE_CONFIG_URL;
+const RUN_LOCAL = process.env.RUN_LOCAL;
 
 async function getSource(url: string) {
   try {
@@ -30,9 +31,9 @@ async function listener() {
     const source = await getSource(task.url);
     if (source) {
       api.sendTaskResult(task.url, source);
-      processing = false;
     }
   }
+  processing = false;
 }
 
 async function fetchConfig() {
@@ -50,21 +51,29 @@ let serviceDaemon;
 async function service() {
   logLine(pc.yellow("Start scraper service"));
 
-  const config = await fetchConfig();
-  if (!config) {
-    logLine(pc.red("Error getting config"));
+  let url = RUN_LOCAL;
+  if (!url) {
+    const config = await fetchConfig();
+    if (!config) {
+      logLine(pc.red("Error getting config"));
 
-    throw new Error("Config file not reachable, contact with provider");
+      throw new Error("Config file not reachable, contact with provider");
+    }
+    url = config.url;
   }
 
   logLine(pc.blue("Config loaded"));
-  api.setBaseUrl(config.url);
+  api.setBaseUrl(url);
 
   serviceDaemon = setInterval(() => {
     if (api.baseRequest.url) {
-      !processing && listener();
+      try {
+        !processing && listener();
+      } catch (e) {
+        logLine(pc.red(`Error, api restarting...`));
+      }
     }
-  }, 1000);
+  }, 2000);
 }
 
 export default service;
