@@ -55,7 +55,7 @@ const typeDefs = `#graphql
           ): [Ticker]
         rawTicker(symbol: String!) : TickerRaw
         nextTickerToUpdate: Ticker
-        task: TaskResult
+        task(scraperId: String!): TaskResult
     }
 
     input TickerInput {
@@ -69,7 +69,7 @@ const typeDefs = `#graphql
         createTicker(symbol: String!) : Ticker
         updateTicker(symbol: String!) : Ticker
         updateAllFromRaw: JSON
-        setTaskSource(url: String!, source: String!): Void
+        setTaskSource(scraperId: String!, url: String!, source: String!): Void
     }
 
 `;

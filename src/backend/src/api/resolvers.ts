@@ -1,4 +1,4 @@
-import taskController from "../controllers/taskController";
+import { scraperController } from "../controllers";
 import TickerModel from "../models/tickerModel";
 import database from "../services/database";
 import updater from "../services/updater";
@@ -66,12 +66,12 @@ const resolvers = {
 
       return await database.getTicker(nextTicker.symbol);
     },
-    async task() {
-      const task = taskController.getTask();
+    async task(_, { scraperId }) {
+      const task = scraperController.getNextTask(scraperId);
       if (task) {
-        return { __typename: "Task", ...task };
+        console.log(task);
+        return task;
       }
-
       return { __typename: "Error", error: "Nothing to do" };
     },
   },
@@ -127,8 +127,16 @@ const resolvers = {
         };
       }
     },
-    async setTaskSource(_, { url, source }) {
-      taskController.setTaskSource({ url, source });
+    async setTaskSource(_, { scraperId, url, source }) {
+      try {
+        scraperController.setTaskSource(scraperId, url, source);
+      } catch (e) {
+        return {
+          __typename: "Error",
+          error: "Problem setting source",
+          dump: e,
+        };
+      }
 
       return { status: "ok" };
     },
