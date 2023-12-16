@@ -41,3 +41,10 @@ export function getPercentColor(percentage: number, median: number) {
 }
 
 export const logLine = (message: any) => console.log("=====", message, "=====");
+
+export const sleep = (ms: number = 2000): Promise<boolean> =>
+  new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true);
+    }, ms);
+  });
