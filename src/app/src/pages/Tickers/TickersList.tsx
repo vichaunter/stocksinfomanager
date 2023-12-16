@@ -54,6 +54,7 @@ const TickersList: FC<Props> = ({ filters }) => {
         ...filters,
       },
       fetchPolicy: "cache-first",
+      pollInterval: 0,
     }
   );
   const {
