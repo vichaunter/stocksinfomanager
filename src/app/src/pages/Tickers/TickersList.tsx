@@ -57,6 +57,7 @@ const TickersList: FC<Props> = ({ filters }) => {
       pollInterval: 0,
     }
   );
+
   const {
     symbol: updateSymbol,
     update: updateTicker,
@@ -66,6 +67,12 @@ const TickersList: FC<Props> = ({ filters }) => {
   useEffect(() => {
     refetch(filters);
   }, [filters]);
+
+  const handleUpdateTickers = async (symbols: string[]) => {
+    for(const symbol of symbols){
+      await updateTicker(symbol)
+    }
+  };
 
   const handleOnSetSorting = (id: string) => {
     if (id === sorting) {
@@ -91,7 +98,8 @@ const TickersList: FC<Props> = ({ filters }) => {
   const startOffset = page < 2 ? 0 : (page - 1) * perPage;
   const endOffset = startOffset + perPage;
 
-  const rows = tickers.slice(startOffset, endOffset).map((ticker) => {
+  const visibleTickers = tickers.slice(startOffset, endOffset);
+  const rows = visibleTickers.map((ticker) => {
     const FavIcon = favorites?.localFavorites?.find(
       (f: any) => f.symbol === ticker.symbol
     )
@@ -172,7 +180,14 @@ const TickersList: FC<Props> = ({ filters }) => {
                 )}
               </Table.Th>
             ))}
-            <Table.Th>Actions</Table.Th>
+            <Table.Th>
+              Actions{" "}
+              <IconRefresh
+                onClick={() =>
+                  handleUpdateTickers(visibleTickers.map((t) => t.symbol))
+                }
+              />
+            </Table.Th>
           </Table.Tr>
         </Table.Thead>
         <Table.Tbody>{rows}</Table.Tbody>

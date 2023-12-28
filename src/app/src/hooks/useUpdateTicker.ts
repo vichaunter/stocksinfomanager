@@ -13,7 +13,7 @@ const useUpdateTicker = () => {
   const handleOnUpdateTicker = (symbol: ApiTicker["symbol"]) => {
     setSymbol(symbol);
 
-    updateTicker({
+    return updateTicker({
       variables: {
         symbol,
       },
