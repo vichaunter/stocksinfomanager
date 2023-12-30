@@ -28,6 +28,7 @@
     "picocolors": "^1.0.0",
     "puppeteer": "^21.2.1",
     "puppeteer-core": "^21.2.1",
+    "simppeteer": "^1.0.1",
     "system-locale": "^0.1.0"
   },
   "devDependencies": {

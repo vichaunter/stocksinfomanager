@@ -3,7 +3,7 @@ import pc from "picocolors";
 import ScraperError from "../../../errors/scraperError";
 import { ScraperHandler } from "../../../types";
 import { camelizeText } from "../../../utils";
-import { browser } from "../../browser";
+import browser from "simppeteer";
 
 const name = "yahoofinance";
 const baseUrl = `https://finance.yahoo.com`;

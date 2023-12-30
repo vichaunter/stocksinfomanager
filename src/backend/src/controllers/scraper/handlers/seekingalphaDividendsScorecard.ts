@@ -4,7 +4,7 @@ import ScraperError from "../../../errors/scraperError";
 import { ScraperHandler } from "../types";
 import { cleanNumber, formatDate } from "@packages/utils";
 import TickerModel from "../../../models/tickerModel";
-import browser from "@packages/browser";
+import browser from "simppeteer";
 
 export type SeekingalphaScorecardData = {
   name: string;

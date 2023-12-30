@@ -2,7 +2,7 @@ import _ from "lodash";
 import pc from "picocolors";
 import TickerModel from "../models/tickerModel";
 import { HandlersData, ScraperHandler } from "../types";
-import { browser } from "./browser";
+import browser from "simppeteer";
 import database from "./database";
 import * as scraperHandlers from "./scraper/handlers";
 

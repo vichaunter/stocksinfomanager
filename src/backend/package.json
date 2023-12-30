@@ -50,6 +50,7 @@
     "puppeteer-core": "^21.2.1",
     "ramda": "^0.29.1",
     "request": "^2.88.2",
+    "simppeteer": "^1.0.1",
     "system-locale": "^0.1.0"
   },
   "devDependencies": {

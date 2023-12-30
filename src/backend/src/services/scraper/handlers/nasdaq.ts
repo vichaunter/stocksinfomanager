@@ -98,7 +98,6 @@ const rawToTicker = <T extends NasdaqRawData>(
     model.setDividendFrequency(frequency);
 
     const lastYearsPayingCount = getLastYearsPayingCount(exDates);
-    console.log({ lastYearsPayingCount });
     model.setDividendLastYearsPayingCount(lastYearsPayingCount);
   }
 

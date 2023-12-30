@@ -3,7 +3,7 @@ import pc from "picocolors";
 import ScraperError from "../../../errors/scraperError";
 import { ScraperHandler } from "../../../types";
 import { camelizeText, cleanNumber, formatDate, sleep } from "../../../utils";
-import { browser } from "../../browser";
+import browser from "simppeteer";
 import database from "../../database";
 import { SeekingAlphaData } from "./types/seekingAlphaTypes";
 import TickerModel from "../../../models/tickerModel";

@@ -4,7 +4,7 @@ import ScraperError from "../../../errors/scraperError";
 import ScraperHandlerError from "../../../errors/scraperHandlerError";
 import { ScraperHandler } from "../../../types";
 import { camelizeText } from "../../../utils";
-import { browser } from "../../browser";
+import browser from "simppeteer";
 import database from "../../database";
 
 const name = "finviz";

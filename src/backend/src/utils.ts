@@ -31,7 +31,7 @@ export const cleanNumber = (str: string): number => {
 };
 
 export const parseDate = (str: string): Dayjs =>
-  dayjs(str, ["MMM DD, YYYY", "DD MMM YYYY", "YYYY-MM-DD"]);
+  dayjs(str, ["MMM DD, YYYY", "DD MMM YYYY", "YYYY-MM-DD", "MM/DD/YYYY"]);
 
 export const formatDate = (date: string | Dayjs, format?): string => {
   const isDateString = typeof date === "string";

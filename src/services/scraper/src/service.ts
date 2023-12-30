@@ -2,7 +2,7 @@ import { logLine } from "@packages/utils";
 import axios from "axios";
 import dotenv from "dotenv";
 import pc from "picocolors";
-import browser from "@packages/browser";
+import browser from "simppeteer";
 import api from "./api/api";
 dotenv.config();
 
