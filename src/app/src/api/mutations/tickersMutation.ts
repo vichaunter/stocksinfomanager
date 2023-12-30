@@ -1,30 +1,13 @@
 import { gql } from "@apollo/client";
+import { TickerFragment } from "../queries/tickersQuery";
 
 export const MUTATION_UPDATE_TICKER = gql`
   mutation UpdateTicker($symbol: String!) {
     updateTicker(symbol: $symbol) {
-      id
-      symbol
-      price
-      name
-      payDividend
-      dividendYield
-      dividendAnnualPayout
-      dividendPayoutRatio
-      dividend5YearGrowhthRate
-      dividendYearsGrowhth
-      dividendAmount
-      dividendExDate
-      dividendPayoutDate
-      dividendRecordDate
-      dividendDeclareDate
-      dividendFrequency
-      nextExDate
-      nextPayDate
-      error
-      updatedAt
+      ...TickerFragment
     }
   }
+  ${TickerFragment}
 `;
 
 export const MUTATION_LOCAL_FAVORITE_TOGGLE = gql`
