@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { Button, Flex, Table, Text } from "@mantine/core";
+import { Button, Flex, NumberFormatter, Table, Text } from "@mantine/core";
 import {
   IconChevronDown,
   IconChevronLeft,
@@ -24,7 +24,6 @@ import useUpdateTicker from "../../hooks/useUpdateTicker";
 dayjs.extend(relativeTime);
 
 const COLUMNS = [
-  { id: "fav", name: "" },
   { id: "symbol", name: "Symbol" },
   { id: "price", name: "Price" },
   { id: "dividendAnnualPayout", name: "Div Annual Payout" },
@@ -40,6 +39,7 @@ type Props = {
 };
 
 const TickersList: FC<Props> = ({ filters }) => {
+  const [onlyFavorites, setOnlyFavorites] = useState(false);
   const [sorting, setSorting] = useState<string>("dividendYield");
   const [sortDir, setSortDir] = useState("desc");
   const [page, setPage] = useState(1);
@@ -62,6 +62,7 @@ const TickersList: FC<Props> = ({ filters }) => {
     symbol: updateSymbol,
     update: updateTicker,
     loading: loadingUpdateTicker,
+    responseDuration,
   } = useUpdateTicker();
 
   useEffect(() => {
@@ -69,9 +70,13 @@ const TickersList: FC<Props> = ({ filters }) => {
   }, [filters]);
 
   const handleUpdateTickers = async (symbols: string[]) => {
-    for(const symbol of symbols){
-      await updateTicker(symbol)
+    for (const symbol of symbols) {
+      await updateTicker(symbol);
     }
+  };
+
+  const handleToggleFavorites = () => {
+    setOnlyFavorites((prev) => !prev);
   };
 
   const handleOnSetSorting = (id: string) => {
@@ -85,10 +90,16 @@ const TickersList: FC<Props> = ({ filters }) => {
   if (error) return <p>Error : {error.message}</p>;
 
   let tickers =
-    data?.tickers?.map((t) => ({
-      ...t,
-      updatedAt: dayjs(t.updatedAt),
-    })) || [];
+    data?.tickers
+      ?.filter((t) =>
+        onlyFavorites
+          ? favorites?.localFavorites?.find((f: any) => f.symbol === t.symbol)
+          : true
+      )
+      ?.map((t) => ({
+        ...t,
+        updatedAt: dayjs(t.updatedAt),
+      })) || [];
 
   tickers.sort((a: any, b: any) => a[sorting] - b[sorting]);
   if (sortDir === "desc") tickers.reverse();
@@ -168,6 +179,11 @@ const TickersList: FC<Props> = ({ filters }) => {
       <Table highlightOnHover striped stickyHeader>
         <Table.Thead>
           <Table.Tr>
+            <Table.Th onClick={handleToggleFavorites}>
+              <Button variant="transparent" color="yellow">
+                {onlyFavorites ? <IconStarFilled /> : <IconStar />}
+              </Button>
+            </Table.Th>
             {COLUMNS.map((h) => (
               <Table.Th key={h.id}>
                 {h.name && (
@@ -186,6 +202,10 @@ const TickersList: FC<Props> = ({ filters }) => {
                 onClick={() =>
                   handleUpdateTickers(visibleTickers.map((t) => t.symbol))
                 }
+              />
+              <NumberFormatter
+                value={(responseDuration * tickers.length) / 60}
+                decimalScale={2}
               />
             </Table.Th>
           </Table.Tr>
